@@ -16,6 +16,7 @@ import { correlationIdFrom, registerCorrelation } from './observability/correlat
 import { loggerOptions } from './observability/logger.js';
 import { createMetrics, registerMetrics } from './observability/metrics.js';
 import { registerHealthRoutes } from './routes/health.js';
+import { registerScenarioRoutes } from './routes/v1/scenarios.routes.js';
 
 /**
  * Montagem da aplicação.
@@ -68,7 +69,15 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
 
   registerHealthRoutes(app, deps.health);
 
-  await app.register(registerV1Routes, { prefix: '/api/v1' });
+  await app.register(
+    async (instance) => {
+      await registerV1Routes(instance);
+      if (deps.auth && deps.scenarios) {
+        registerScenarioRoutes(instance, { auth: deps.auth, scenarios: deps.scenarios });
+      }
+    },
+    { prefix: '/api/v1' },
+  );
 
   await app.ready();
   return app;
@@ -101,35 +110,4 @@ async function registerV1Routes(app: FastifyInstance): Promise<void> {
     // vaza na resposta.
     throw new Error('conexão com o banco falhou: senha=segredo');
   });
-
-  // Placeholder documentado enquanto as rotas reais não entram: a OpenAPI
-  // precisa ter ao menos um caminho para ser útil desde já.
-  typed.get(
-    '/model-packages',
-    {
-      schema: {
-        summary: 'Pacotes de modelos disponíveis para o cálculo',
-        description:
-          'Cada pacote define, junto, os modelos candidatos e a profundidade do backtest (FR-034c).',
-        response: {
-          200: z.object({
-            data: z.array(
-              z.object({
-                id: z.enum(['FAST', 'STANDARD', 'COMPLETE']),
-                models: z.array(z.string()),
-                backtestWindows: z.number().int(),
-              }),
-            ),
-          }),
-        },
-      },
-    },
-    async () => ({
-      data: [
-        { id: 'FAST' as const, models: [], backtestWindows: 1 },
-        { id: 'STANDARD' as const, models: [], backtestWindows: 3 },
-        { id: 'COMPLETE' as const, models: [], backtestWindows: 4 },
-      ],
-    }),
-  );
 }

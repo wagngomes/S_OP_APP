@@ -28,3 +28,21 @@ export {
   PaginationQuery,
   ScenarioPhase,
 } from './http/common.js';
+
+export {
+  AccuracyMetric,
+  CreateScenarioBody,
+  FinalSayRole,
+  LevelsResponse,
+  ModelPackage,
+  ModelPackageInfo,
+  ModelPackagesResponse,
+  ParametersBody,
+  ParametersResponse,
+  ScenarioDetail,
+  ScenarioIdParam,
+  ScenarioSummary,
+  SegmentationLevel,
+  SeriesPreviewQuery,
+  SeriesPreviewResponse,
+} from './http/scenarios.js';

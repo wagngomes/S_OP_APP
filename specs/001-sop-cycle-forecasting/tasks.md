@@ -184,14 +184,14 @@ previsão consistente, sem nenhuma das outras histórias.
 ### API de orquestração
 
 - [ ] T094 [P] [US1] Implementar as rotas de cadastro, login, logout, recuperação e sessão em apps/api/src/routes/v1/auth.routes.ts (FR-001 a FR-004)
-- [ ] T095 [P] [US1] Implementar controller e service de criação e leitura de cenário em apps/api/src/controllers/scenario.controller.ts e apps/api/src/services/scenario.service.ts (FR-006, FR-007)
+- [X] T095 [P] [US1] Implementar controller e service de criação e leitura de cenário em apps/api/src/controllers/scenario.controller.ts e apps/api/src/services/scenario.service.ts (FR-006, FR-007)
 - [ ] T096 [US1] Implementar a rota de upload multipart em streaming direto para o MinIO, validando apenas o envelope e respondendo 202, em apps/api/src/routes/v1/upload.routes.ts (D7)
 - [ ] T097 [US1] Implementar a criação do IngestionJob e a publicação em `sop.ingestion.request.v1` em apps/api/src/services/ingestion.service.ts
 - [ ] T098 [US1] Implementar as rotas de status e de relatório paginado de issues em apps/api/src/routes/v1/ingestion.routes.ts (FR-024, FR-027)
-- [ ] T099 [P] [US1] Implementar a rota de níveis declarados em apps/api/src/routes/v1/levels.routes.ts (FR-031)
-- [ ] T100 [US1] Implementar a rota de parametrização com todas as validações e o aviso `zeroHeavyWarning` em apps/api/src/routes/v1/parameters.routes.ts (FR-032 a FR-036a)
-- [ ] T101 [US1] Implementar a rota `series-preview` com `COUNT(DISTINCT)` e estimativa de tempo em apps/api/src/routes/v1/series-preview.routes.ts (FR-034a, FR-034d, D1a)
-- [ ] T102 [P] [US1] Implementar a rota de catálogo de pacotes de modelos em apps/api/src/routes/v1/model-packages.routes.ts (FR-034c)
+- [X] T099 [P] [US1] Implementar a rota de níveis declarados em apps/api/src/routes/v1/levels.routes.ts (FR-031)
+- [X] T100 [US1] Implementar a rota de parametrização com todas as validações e o aviso `zeroHeavyWarning` em apps/api/src/routes/v1/parameters.routes.ts (FR-032 a FR-036a)
+- [X] T101 [US1] Implementar a rota `series-preview` com `COUNT(DISTINCT)` e estimativa de tempo em apps/api/src/routes/v1/series-preview.routes.ts (FR-034a, FR-034d, D1a)
+- [X] T102 [P] [US1] Implementar a rota de catálogo de pacotes de modelos em apps/api/src/routes/v1/model-packages.routes.ts (FR-034c)
 - [ ] T103 [US1] Implementar o disparo do cálculo com exportação do dataset para o MinIO e publicação da referência, recusando com 409 quando já houver job ativo, em apps/api/src/services/forecast.service.ts (FR-051)
 - [ ] T104 [US1] Implementar o consumidor de `sop.forecast.result.v1` que persiste ForecastItem e ForecastSeriesResult e avança a fase, em apps/api/src/adapters/rabbitmq/forecast-result.consumer.ts
 - [ ] T105 [US1] Implementar as rotas de leitura de forecast-items e forecast-series, recusando com 409 enquanto o job não concluir, em apps/api/src/routes/v1/forecast.routes.ts (FR-048, FR-052)

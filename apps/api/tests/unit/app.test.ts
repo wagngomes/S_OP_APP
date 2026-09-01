@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { buildApp } from '../../src/app.js';
 import type { AppDependencies } from '../../src/composition/ports.js';
+import { InMemoryScenarios, fakeAuth } from '../fakes/in-memory-scenarios.js';
 
 /**
  * Testes do esqueleto da API via `app.inject()`: sem rede, sem banco, sem Docker.
@@ -34,12 +35,24 @@ describe('bootstrap', () => {
   });
 
   it('serve a OpenAPI derivada dos schemas Zod', async () => {
-    app = await buildApp(healthyDeps());
+    // As rotas de negócio só existem quando as portas são injetadas, então a
+    // OpenAPI com caminhos exige um app completo — não o esqueleto puro.
+    app = await buildApp({
+      ...healthyDeps(),
+      auth: fakeAuth(),
+      scenarios: new InMemoryScenarios(),
+    });
     const res = await app.inject({ method: 'GET', url: '/api/v1/openapi.json' });
     expect(res.statusCode).toBe(200);
     const doc = res.json() as { openapi: string; paths: Record<string, unknown> };
     expect(doc.openapi).toMatch(/^3\./);
     expect(Object.keys(doc.paths).length).toBeGreaterThan(0);
+  });
+
+  it('o esqueleto sem portas sobe e serve a OpenAPI, ainda que sem rotas de negócio', async () => {
+    app = await buildApp(healthyDeps());
+    const res = await app.inject({ method: 'GET', url: '/api/v1/openapi.json' });
+    expect(res.statusCode).toBe(200);
   });
 });
 

@@ -29,9 +29,88 @@ export type DatasetStore = {
   presignGet(uri: string, expiresInSeconds: number): Promise<string>;
 };
 
+/** Identidade do requisitante. A autorização de processo é do domínio (D8). */
+export type Authenticator = {
+  currentUser(headers: Record<string, string | string[] | undefined>): Promise<{ id: string } | null>;
+};
+
+// --- Registros de leitura ----------------------------------------------------
+
+export type ScenarioRecord = {
+  id: string;
+  name: string;
+  phase:
+    | 'TEAM_SETUP'
+    | 'IMPORT_SETUP'
+    | 'CALCULATION'
+    | 'APPROVAL'
+    | 'COLLABORATION'
+    | 'CONSENSUS'
+    | 'PUBLICATION'
+    | 'ACCURACY';
+  createdById: string;
+  finalSayRole: 'CREATOR' | 'APPROVER';
+  teamClosedAt: string | null;
+  forecastHorizonMonths: number;
+  publishedAt: string | null;
+  createdAt: string;
+};
+
+export type SegmentationLevelRecord = {
+  id: string;
+  position: number;
+  label: string;
+};
+
+export type ParametersRecord = {
+  groupingLevelIds: string[];
+  prorationMonths: number;
+  accuracyMetric: 'WMAPE' | 'MAPE' | 'BIAS';
+  modelPackage: 'FAST' | 'STANDARD' | 'COMPLETE';
+  horizonMonths: number;
+};
+
+/** Estatísticas do histórico usadas na validação e na prévia de custo. */
+export type HistoryStats = {
+  availableHistoryMonths: number;
+  /** Proporção de meses com realizado zero, entre 0 e 1 (FR-036a). */
+  zeroMonthProportion: number;
+};
+
+export type ScenarioRepository = {
+  create(input: {
+    name: string;
+    createdById: string;
+    finalSayRole: 'CREATOR' | 'APPROVER';
+    forecastHorizonMonths: number;
+  }): Promise<ScenarioRecord>;
+
+  findById(id: string): Promise<ScenarioRecord | null>;
+
+  /** FR-005 — só participantes enxergam o cenário. */
+  isMember(scenarioId: string, userId: string): Promise<boolean>;
+
+  listForUser(
+    userId: string,
+    page: { limit: number; offset: number },
+  ): Promise<{ data: ScenarioRecord[]; total: number }>;
+
+  listLevels(scenarioId: string): Promise<SegmentationLevelRecord[]>;
+
+  getParameters(scenarioId: string): Promise<ParametersRecord | null>;
+  saveParameters(scenarioId: string, params: ParametersRecord): Promise<void>;
+
+  historyStats(scenarioId: string): Promise<HistoryStats>;
+
+  /** FR-034a — `COUNT(DISTINCT)` sobre o histórico já persistido (D1a). */
+  countDistinctSeries(scenarioId: string, levelIds: string[]): Promise<number>;
+};
+
 /** Dependências que o `buildApp` recebe. */
 export type AppDependencies = {
   health: HealthChecks;
+  auth?: Authenticator;
+  scenarios?: ScenarioRepository;
   publisher?: JobPublisher;
   datasets?: DatasetStore;
   /** Sobrescreve o logger — usado nos testes para capturar o que foi emitido. */
