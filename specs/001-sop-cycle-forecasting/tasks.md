@@ -40,19 +40,19 @@ Monorepo pnpm com serviço Python irmão, conforme a seção *Project Structure*
 
 **Purpose**: estrutura do monorepo e ferramental
 
-- [ ] T001 Criar a estrutura de diretórios do monorepo e `pnpm-workspace.yaml` na raiz, conforme a seção Project Structure de specs/001-sop-cycle-forecasting/plan.md
-- [ ] T002 [P] Inicializar `packages/contracts` com package.json, tsconfig.json e vitest.config.ts
-- [ ] T003 [P] Inicializar `packages/domain` com package.json, tsconfig.json e vitest.config.ts
-- [ ] T004 [P] Inicializar `apps/api` com package.json, tsconfig.json e vitest.config.ts
-- [ ] T005 [P] Inicializar `apps/ingestion-worker` com package.json, tsconfig.json e vitest.config.ts
-- [ ] T006 [P] Inicializar `apps/email-worker` com package.json, tsconfig.json e vitest.config.ts
+- [X] T001 Criar a estrutura de diretórios do monorepo e `pnpm-workspace.yaml` na raiz, conforme a seção Project Structure de specs/001-sop-cycle-forecasting/plan.md
+- [X] T002 [P] Inicializar `packages/contracts` com package.json, tsconfig.json e vitest.config.ts
+- [X] T003 [P] Inicializar `packages/domain` com package.json, tsconfig.json e vitest.config.ts
+- [X] T004 [P] Inicializar `apps/api` com package.json, tsconfig.json e vitest.config.ts
+- [X] T005 [P] Inicializar `apps/ingestion-worker` com package.json, tsconfig.json e vitest.config.ts
+- [X] T006 [P] Inicializar `apps/email-worker` com package.json, tsconfig.json e vitest.config.ts
 - [ ] T007 [P] Inicializar `apps/web` com Next.js 15 App Router e Tailwind CSS em apps/web/package.json
-- [ ] T008 [P] Configurar a paleta como tokens semânticos (turquesa, petroleo, branco, grafite, verde, cinza) em apps/web/tailwind.config.ts, conforme D19 de research.md
-- [ ] T009 [P] Inicializar `services/forecast-engine` com pyproject.toml, dependências StatsForecast/pandas/pika/boto3/pydantic e configuração do pytest
-- [ ] T010 [P] Configurar ESLint e Prettier na raiz em eslint.config.js e .prettierrc
-- [ ] T011 [P] Configurar Ruff em services/forecast-engine/pyproject.toml
-- [ ] T012 [P] Criar .env.example na raiz com todas as variáveis por serviço, sem segredos reais
-- [ ] T013 Configurar dependency-cruiser em .dependency-cruiser.js proibindo que `packages/domain` importe Fastify, Prisma, amqplib, pino ou prom-client (Princípios I e IX)
+- [X] T008 [P] Configurar a paleta como tokens semânticos (turquesa, petroleo, branco, grafite, verde, cinza) em apps/web/tailwind.config.ts, conforme D19 de research.md
+- [X] T009 [P] Inicializar `services/forecast-engine` com pyproject.toml, dependências StatsForecast/pandas/pika/boto3/pydantic e configuração do pytest
+- [X] T010 [P] Configurar ESLint e Prettier na raiz em eslint.config.js e .prettierrc
+- [X] T011 [P] Configurar Ruff em services/forecast-engine/pyproject.toml
+- [X] T012 [P] Criar .env.example na raiz com todas as variáveis por serviço, sem segredos reais
+- [X] T013 Configurar dependency-cruiser em .dependency-cruiser.js proibindo que `packages/domain` importe Fastify, Prisma, amqplib, pino ou prom-client (Princípios I e IX)
 
 ---
 
@@ -64,25 +64,25 @@ Monorepo pnpm com serviço Python irmão, conforme a seção *Project Structure*
 
 ### Codec decimal e contratos — a fundação do Princípio V
 
-- [ ] T014 [P] Escrever os vetores dourados em packages/contracts/src/golden/decimal.json com os casos da tabela de contracts/decimal-codec.md
-- [ ] T015 [P] Escrever teste unitário do codec decimal (canonicalização, meio-para-cima, rejeição de científico e de excesso de casas) em packages/contracts/tests/decimal-string.test.ts — DEVE FALHAR antes de T017
-- [ ] T016 [P] Escrever teste pytest do codec espelhado lendo os mesmos vetores em services/forecast-engine/tests/contract/test_decimal_codec.py — DEVE FALHAR antes de T018
-- [ ] T017 Implementar `DecimalString` (Zod) e helpers de quantização em packages/contracts/src/decimal/decimal-string.ts
-- [ ] T018 Implementar o codec decimal espelhado em services/forecast-engine/src/forecast_engine/domain/decimal_codec.py
-- [ ] T019 Implementar teste de guarda que varre packages/contracts e falha se `z.number()` aparecer em campo de grandeza sensível, em packages/contracts/tests/no-float-guard.test.ts
-- [ ] T020 [P] Definir o envelope de mensagem (messageId, correlationId, occurredAt, version, type, payload) em packages/contracts/src/messaging/envelope.ts
-- [ ] T021 [P] Definir o envelope espelhado em Pydantic em services/forecast-engine/src/forecast_engine/messaging/envelope.py
-- [ ] T022 [P] Definir schemas HTTP comuns (paginação offset-based limit 100, formato de erro) em packages/contracts/src/http/common.ts
-- [ ] T023 Escrever teste de contrato bilateral do envelope (rejeita mensagem sem correlationId; rejeita número JSON em campo sensível) em packages/contracts/tests/envelope.contract.test.ts e services/forecast-engine/tests/contract/test_envelope.py
+- [X] T014 [P] Escrever os vetores dourados em packages/contracts/src/golden/decimal.json com os casos da tabela de contracts/decimal-codec.md
+- [X] T015 [P] Escrever teste unitário do codec decimal (canonicalização, meio-para-cima, rejeição de científico e de excesso de casas) em packages/contracts/tests/decimal-string.test.ts — DEVE FALHAR antes de T017
+- [X] T016 [P] Escrever teste pytest do codec espelhado lendo os mesmos vetores em services/forecast-engine/tests/contract/test_decimal_codec.py — DEVE FALHAR antes de T018
+- [X] T017 Implementar `DecimalString` (Zod) e helpers de quantização em packages/contracts/src/decimal/decimal-string.ts
+- [X] T018 Implementar o codec decimal espelhado em services/forecast-engine/src/forecast_engine/domain/decimal_codec.py
+- [X] T019 Implementar teste de guarda que varre packages/contracts e falha se `z.number()` aparecer em campo de grandeza sensível, em packages/contracts/tests/no-float-guard.test.ts
+- [X] T020 [P] Definir o envelope de mensagem (messageId, correlationId, occurredAt, version, type, payload) em packages/contracts/src/messaging/envelope.ts
+- [X] T021 [P] Definir o envelope espelhado em Pydantic em services/forecast-engine/src/forecast_engine/messaging/envelope.py
+- [X] T022 [P] Definir schemas HTTP comuns (paginação offset-based limit 100, formato de erro) em packages/contracts/src/http/common.ts
+- [X] T023 Escrever teste de contrato bilateral do envelope (rejeita mensagem sem correlationId; rejeita número JSON em campo sensível) em packages/contracts/tests/envelope.contract.test.ts e services/forecast-engine/tests/contract/test_envelope.py
 
 ### Persistência
 
-- [ ] T024 Implementar o schema Prisma completo com as 20 entidades de data-model.md em apps/api/prisma/schema.prisma, usando `Decimal(18,6)` para quantidade e `Decimal(12,6)` para métrica
-- [ ] T025 Declarar `binaryTargets` incluindo `linux-musl-openssl-3.0.x` em apps/api/prisma/schema.prisma
-- [ ] T026 Gerar a migração inicial em apps/api/prisma/migrations/
-- [ ] T027 Criar índice parcial único garantindo no máximo um ForecastJob ativo por cenário, em apps/api/prisma/migrations/ (FR-051)
-- [ ] T028 Criar trigger de imutabilidade sobre PublishedForecast e AuditEvent em apps/api/prisma/migrations/ (FR-076, FR-100)
-- [ ] T029 [P] Criar apps/api/docker-entrypoint.sh executando `prisma migrate deploy` antes do boot
+- [X] T024 Implementar o schema Prisma completo com as 20 entidades de data-model.md em apps/api/prisma/schema.prisma, usando `Decimal(18,6)` para quantidade e `Decimal(12,6)` para métrica
+- [X] T025 Declarar `binaryTargets` incluindo `linux-musl-openssl-3.0.x` em apps/api/prisma/schema.prisma
+- [X] T026 Gerar a migração inicial em apps/api/prisma/migrations/
+- [X] T027 Criar índice parcial único garantindo no máximo um ForecastJob ativo por cenário, em apps/api/prisma/migrations/ (FR-051)
+- [X] T028 Criar trigger de imutabilidade sobre PublishedForecast e AuditEvent em apps/api/prisma/migrations/ (FR-076, FR-100)
+- [X] T029 [P] Criar apps/api/docker-entrypoint.sh executando `prisma migrate deploy` antes do boot
 
 ### Contêineres e orquestração
 
@@ -102,7 +102,7 @@ Monorepo pnpm com serviço Python irmão, conforme a seção *Project Structure*
 - [ ] T040 [P] Expor `/metrics` com prom-client em apps/api/src/observability/metrics.ts
 - [ ] T041 [P] Expor `/metrics` e structlog JSON em services/forecast-engine/src/forecast_engine/adapters/observability.py
 - [ ] T042 [P] Expor `/metrics` e logs JSON em apps/ingestion-worker/src/observability/ e apps/email-worker/src/observability/
-- [ ] T043 Escrever teste que executa `packages/domain` sem banco, sem rede e sem servidor, provando o isolamento do domínio, em packages/domain/tests/isolation.test.ts
+- [X] T043 Escrever teste que executa `packages/domain` sem banco, sem rede e sem servidor, provando o isolamento do domínio, em packages/domain/tests/isolation.test.ts
 
 ### Mensageria e armazenamento
 
@@ -142,7 +142,7 @@ previsão consistente, sem nenhuma das outras histórias.
 ### Tests for User Story 1
 
 - [ ] T061 [P] [US1] Teste de contrato das rotas de autenticação em apps/api/tests/contract/auth.contract.test.ts
-- [ ] T062 [P] [US1] Teste unitário da validação de contagem de segmentos contra os rótulos declarados em packages/domain/tests/ingestion/segment-validation.test.ts (FR-023, FR-024)
+- [X] T062 [P] [US1] Teste unitário da validação de contagem de segmentos contra os rótulos declarados em packages/domain/tests/ingestion/segment-validation.test.ts (FR-023, FR-024)
 - [ ] T063 [P] [US1] Teste unitário do preenchimento de lacunas internas e do corte do prefixo anterior à primeira venda em services/forecast-engine/tests/unit/test_gap_filling.py (FR-040d, D15)
 - [ ] T064 [P] [US1] Teste unitário da agregação do histórico por combinação de níveis em services/forecast-engine/tests/unit/test_aggregation.py
 - [ ] T065 [P] [US1] Teste unitário do piso zero aplicado à série agregada antes do rateio em services/forecast-engine/tests/unit/test_zero_floor.py (FR-040a, FR-040b, D16)
@@ -157,10 +157,10 @@ previsão consistente, sem nenhuma das outras histórias.
 
 ### Domínio compartilhado (TypeScript)
 
-- [ ] T074 [P] [US1] Implementar a máquina de fases do cenário com as transições permitidas em packages/domain/src/scenario/phase-machine.ts (FR-008, FR-016)
-- [ ] T075 [P] [US1] Implementar a validação de layout e contagem de segmentos em packages/domain/src/ingestion/segment-validation.ts (FR-023)
-- [ ] T076 [P] [US1] Implementar a consolidação de linhas duplicadas por soma em packages/domain/src/ingestion/deduplicate.ts (FR-028)
-- [ ] T077 [P] [US1] Implementar a validação da parametrização (combinação não vazia, sem repetição, meses dentro do histórico, pacote obrigatório) em packages/domain/src/scenario/parameters.ts (FR-032b, FR-032c, FR-034, FR-034b)
+- [X] T074 [P] [US1] Implementar a máquina de fases do cenário com as transições permitidas em packages/domain/src/scenario/phase-machine.ts (FR-008, FR-016)
+- [X] T075 [P] [US1] Implementar a validação de layout e contagem de segmentos em packages/domain/src/ingestion/segment-validation.ts (FR-023)
+- [X] T076 [P] [US1] Implementar a consolidação de linhas duplicadas por soma em packages/domain/src/ingestion/deduplicate.ts (FR-028)
+- [X] T077 [P] [US1] Implementar a validação da parametrização (combinação não vazia, sem repetição, meses dentro do histórico, pacote obrigatório) em packages/domain/src/scenario/parameters.ts (FR-032b, FR-032c, FR-034, FR-034b)
 
 ### Motor de cálculo (Python)
 

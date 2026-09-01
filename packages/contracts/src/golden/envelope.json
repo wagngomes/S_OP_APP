@@ -1,0 +1,99 @@
+{
+  "$comment": "Vetores dourados do envelope de mensageria. Lidos por Vitest e por pytest. Ver specs/001-sop-cycle-forecasting/contracts/messaging.md",
+  "version": 1,
+
+  "accept": [
+    {
+      "name": "forecast-request-minimo",
+      "message": {
+        "messageId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6b",
+        "correlationId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6c",
+        "occurredAt": "2026-09-01T14:03:22.481Z",
+        "version": 1,
+        "type": "forecast.request",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6d",
+          "scenarioId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6e"
+        }
+      }
+    }
+  ],
+
+  "reject": [
+    {
+      "name": "sem-correlation-id",
+      "$comment": "Princípio IX: sem correlação não há como seguir um cálculo ponta a ponta.",
+      "message": {
+        "messageId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6b",
+        "occurredAt": "2026-09-01T14:03:22.481Z",
+        "version": 1,
+        "type": "forecast.request",
+        "payload": {}
+      }
+    },
+    {
+      "name": "correlation-id-nao-uuid",
+      "message": {
+        "messageId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6b",
+        "correlationId": "nao-e-uuid",
+        "occurredAt": "2026-09-01T14:03:22.481Z",
+        "version": 1,
+        "type": "forecast.request",
+        "payload": {}
+      }
+    },
+    {
+      "name": "tipo-desconhecido",
+      "message": {
+        "messageId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6b",
+        "correlationId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6c",
+        "occurredAt": "2026-09-01T14:03:22.481Z",
+        "version": 1,
+        "type": "forecast.explodir",
+        "payload": {}
+      }
+    },
+    {
+      "name": "versao-errada",
+      "message": {
+        "messageId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6b",
+        "correlationId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6c",
+        "occurredAt": "2026-09-01T14:03:22.481Z",
+        "version": 2,
+        "type": "forecast.request",
+        "payload": {}
+      }
+    },
+    {
+      "name": "data-sem-fuso",
+      "message": {
+        "messageId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6b",
+        "correlationId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6c",
+        "occurredAt": "2026-09-01 14:03:22",
+        "version": 1,
+        "type": "forecast.request",
+        "payload": {}
+      }
+    }
+  ],
+
+  "objectUri": {
+    "accept": [
+      "s3://sop/datasets/abc/def/input.parquet",
+      "s3://sop-prod/uploads/1/2/original.csv"
+    ],
+    "reject": [
+      "https://sop/datasets/a.parquet",
+      "s3://",
+      "s3://sop",
+      "/datasets/a.parquet",
+      ""
+    ]
+  },
+
+  "sensitiveNumberInPayload": {
+    "$comment": "Princípio V na fronteira da fila: quantidade como número JSON deve ser recusada; como string decimal, aceita.",
+    "reject": { "quantity": 1234.5 },
+    "accept": { "quantity": "1234.500000" }
+  }
+}

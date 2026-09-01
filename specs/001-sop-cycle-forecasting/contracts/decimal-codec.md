@@ -66,20 +66,49 @@ isoladamente não garante isso. O algoritmo normativo é **maior resto**:
 
 Resultado: `sum(children) == parent`, exato, sempre.
 
+## Duas operações distintas — não confundir
+
+Esta separação foi descoberta na implementação e é a fonte mais provável de erro aqui.
+
+| Operação | Quando | Casas extras |
+|----------|--------|--------------|
+| **parse** (`DecimalString`) | valor ATRAVESSANDO a fronteira — HTTP, fila, Parquet | **Erro.** Mais de 6 casas é defeito de quem produziu o valor; arredondar em silêncio esconderia o defeito |
+| **quantize** | saída do motor, trazendo o resultado de volta do float64 | **Esperadas.** É exatamente o ponto da operação: arredondar com `ROUND_HALF_UP` |
+
+Usar `parse` onde cabia `quantize` faz o motor falhar ao devolver qualquer resultado real. Usar
+`quantize` onde cabia `parse` aceita silenciosamente um valor malformado do outro lado da
+fronteira — que é o erro mais caro dos dois.
+
 ## Vetores dourados
 
-`packages/contracts/src/golden/decimal.json` é lido por Vitest e por pytest. Casos mínimos:
+`packages/contracts/src/golden/decimal.json` é lido por Vitest e por pytest, em três seções.
+
+**`parse.accept` / `parse.reject`** — a gramática do contrato:
 
 | Caso | Entrada | Esperado |
 |------|---------|----------|
 | Canonicalização | `"1.5"` | `"1.500000"` |
-| Meio para cima | `"0.0000005"` | `"0.000001"` |
-| Negativo meio para cima | `"-0.0000005"` | `"-0.000001"` |
+| Zero canônico | `"-0"` | `"0.000000"` |
 | Rejeição de científico | `"1e3"` | erro |
 | Rejeição de excesso de casas | `"1.1234567"` | erro |
-| Rateio conserva | pai `"100.000000"`, pesos `[1/3, 1/3, 1/3]` | filhos somam exatamente `"100.000000"` |
+| Rejeição de número nativo | `1.5` (não string) | erro |
+
+**`quantize.cases`** — a conversão de saída do motor:
+
+| Caso | Entrada | Esperado |
+|------|---------|----------|
+| Meio para cima | `"0.0000005"` | `"0.000001"` |
+| Negativo meio para cima | `"-0.0000005"` | `"-0.000001"` |
+| Abaixo do meio | `"0.00000049"` | `"0.000000"` |
+| A partir de float | `0.1 + 0.2` | `"0.300000"` |
+
+**`proration.cases`** — verificados no lado Python, dono do cálculo:
+
+| Caso | Entrada | Esperado |
+|------|---------|----------|
+| Rateio conserva | pai `"100.000000"`, pesos `[1, 1, 1]` | `["33.333334", "33.333333", "33.333333"]`, soma exata |
 | Rateio com peso zero | pai `"10.000000"`, pesos `[1, 0]` | segundo filho `"0.000000"` |
-| Representatividade nula | pai `"10.000000"`, todos os pesos zero | comportamento explícito de FR-047 |
+| Representatividade nula | pai `"10.000000"`, todos os pesos zero | divisão igual entre os filhos, preservando a soma (FR-047) |
 
 ## Testes de guarda obrigatórios
 

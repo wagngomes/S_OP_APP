@@ -1,0 +1,48 @@
+[project]
+name = "forecast-engine"
+version = "0.1.0"
+description = "SOP_APP — motor de cálculo de previsão de demanda"
+requires-python = ">=3.12,<3.13"
+
+dependencies = [
+    "statsforecast>=2.0.0",
+    "utilsforecast>=0.2.10",
+    "pandas>=2.2.0",
+    "pyarrow>=18.0.0",
+    "numpy>=1.26,<2.2",
+    "pika>=1.3.2",
+    "boto3>=1.35.0",
+    "pydantic>=2.10.0",
+    "structlog>=24.4.0",
+    "prometheus-client>=0.21.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
+    "hypothesis>=6.122.0",
+    "ruff>=0.8.0",
+    "testcontainers>=4.9.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/forecast_engine"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "contract: testes de contrato bilateral com o lado TypeScript",
+    "integration: exigem MinIO/RabbitMQ reais",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM"]

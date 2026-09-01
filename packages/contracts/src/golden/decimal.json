@@ -1,0 +1,95 @@
+{
+  "$comment": "Vetores dourados do codec decimal. Lidos por Vitest (TypeScript) e por pytest (Python). Uma divergência de interpretação entre as linguagens quebra as duas suítes. Ver specs/001-sop-cycle-forecasting/contracts/decimal-codec.md",
+  "scale": 6,
+  "rounding": "ROUND_HALF_UP",
+
+  "parse": {
+    "$comment": "O que a gramática do contrato aceita ao ATRAVESSAR a fronteira. No máximo 6 casas — mais que isso é erro de quem produziu, não algo a arredondar em silêncio.",
+    "accept": [
+      { "input": "0", "canonical": "0.000000" },
+      { "input": "-0", "canonical": "0.000000" },
+      { "input": "1.5", "canonical": "1.500000" },
+      { "input": "1234.5", "canonical": "1234.500000" },
+      { "input": "-3.25", "canonical": "-3.250000" },
+      { "input": "0.000001", "canonical": "0.000001" },
+      { "input": "-0.000001", "canonical": "-0.000001" },
+      { "input": "1234567890123.123456", "canonical": "1234567890123.123456" }
+    ],
+    "reject": [
+      "1e3",
+      "1E3",
+      "1.1234567",
+      "",
+      " ",
+      "NaN",
+      "Infinity",
+      "-Infinity",
+      "1,5",
+      " 1.5",
+      "1.5 ",
+      "+1.5",
+      "1.",
+      ".5",
+      "--1",
+      "abc",
+      "0x10"
+    ]
+  },
+
+  "quantize": {
+    "$comment": "Conversão de precisão arbitrária para a escala do sistema. Usada APENAS na saída do motor, ao trazer o resultado de volta do float64. Distinta de parse: aqui mais casas são esperadas e devem ser arredondadas com HALF_UP.",
+    "cases": [
+      { "input": "0.0000005", "expected": "0.000001" },
+      { "input": "-0.0000005", "expected": "-0.000001" },
+      { "input": "0.00000049", "expected": "0.000000" },
+      { "input": "-0.00000049", "expected": "0.000000" },
+      { "input": "1.9999995", "expected": "2.000000" },
+      { "input": "2.5", "expected": "2.500000" },
+      { "input": "33.3333335", "expected": "33.333334" },
+      { "input": "0", "expected": "0.000000" }
+    ]
+  },
+
+  "proration": {
+    "$comment": "Rateio por maior resto. Verificado no lado Python, dono do cálculo (Princípio III). A soma dos filhos DEVE ser exatamente igual ao pai — FR-046.",
+    "cases": [
+      {
+        "name": "tercos-exatos-com-residuo",
+        "parent": "100.000000",
+        "weights": ["1", "1", "1"],
+        "expected": ["33.333334", "33.333333", "33.333333"]
+      },
+      {
+        "name": "peso-zero-em-um-filho",
+        "parent": "10.000000",
+        "weights": ["1", "0"],
+        "expected": ["10.000000", "0.000000"]
+      },
+      {
+        "name": "representatividade-nula-divide-igual",
+        "$comment": "FR-047: sem representatividade no período, a divisão é igual entre os filhos. Zerar todos quebraria a conservação de soma.",
+        "parent": "10.000000",
+        "weights": ["0", "0", "0"],
+        "expected": ["3.333334", "3.333333", "3.333333"]
+      },
+      {
+        "name": "pai-zero",
+        "parent": "0.000000",
+        "weights": ["5", "3", "2"],
+        "expected": ["0.000000", "0.000000", "0.000000"]
+      },
+      {
+        "name": "proporcional-simples",
+        "parent": "100.000000",
+        "weights": ["5", "3", "2"],
+        "expected": ["50.000000", "30.000000", "20.000000"]
+      },
+      {
+        "name": "filho-unico-recebe-tudo",
+        "parent": "77.777777",
+        "weights": ["9"],
+        "expected": ["77.777777"]
+      }
+    ]
+  }
+}
