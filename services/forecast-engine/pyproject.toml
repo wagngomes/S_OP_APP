@@ -2,7 +2,10 @@
 name = "forecast-engine"
 version = "0.1.0"
 description = "SOP_APP — motor de cálculo de previsão de demanda"
-requires-python = ">=3.12,<3.13"
+# 3.12 é o alvo da imagem Docker (python:3.12-slim, D4). O teto foi aberto até
+# 3.14 porque numba/llvmlite passaram a publicar wheels para 3.13, e a máquina de
+# desenvolvimento roda 3.13 — verificado com statsforecast 2.0.1 e numba 0.61.2.
+requires-python = ">=3.12,<3.14"
 
 dependencies = [
     "statsforecast>=2.0.0",

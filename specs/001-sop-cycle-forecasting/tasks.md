@@ -147,7 +147,7 @@ previsão consistente, sem nenhuma das outras histórias.
 - [X] T064 [P] [US1] Teste unitário da agregação do histórico por combinação de níveis em services/forecast-engine/tests/unit/test_aggregation.py
 - [X] T065 [P] [US1] Teste unitário do piso zero aplicado à série agregada antes do rateio em services/forecast-engine/tests/unit/test_zero_floor.py (FR-040a, FR-040b, D16)
 - [X] T066 [P] [US1] Teste de propriedade provando `soma(filhos) == pai` em rateios aleatórios em services/forecast-engine/tests/unit/test_proration_conservation.py (FR-046)
-- [ ] T067 [P] [US1] Teste unitário de cada métrica do catálogo, incluindo denominador zero, em services/forecast-engine/tests/unit/test_metrics.py (FR-036, FR-086)
+- [X] T067 [P] [US1] Teste unitário de cada métrica do catálogo, incluindo denominador zero, em services/forecast-engine/tests/unit/test_metrics.py (FR-036, FR-086)
 - [ ] T068 [P] [US1] Teste unitário da seleção do modelo vencedor por métrica e da exclusão de candidatos por histórico insuficiente em services/forecast-engine/tests/unit/test_model_selection.py (FR-042, FR-043b, D14)
 - [ ] T069 [P] [US1] Teste de contrato de `forecast.request` e `forecast.result` nos dois lados em packages/contracts/tests/forecast.contract.test.ts e services/forecast-engine/tests/contract/test_forecast_messages.py
 - [ ] T070 [P] [US1] Teste de integração do upload respondendo 202 sem parsear conteúdo em apps/api/tests/integration/upload-202.test.ts (D7)
@@ -169,7 +169,7 @@ previsão consistente, sem nenhuma das outras histórias.
 - [X] T080 [US1] Implementar o preenchimento de lacunas internas e o corte do prefixo pré-primeira-venda em services/forecast-engine/src/forecast_engine/domain/series_preparation.py (FR-040d, D15)
 - [ ] T081 [P] [US1] Implementar o catálogo de modelos nos três pacotes Rápido/Standard/Completo em services/forecast-engine/src/forecast_engine/domain/model_catalog.py (D1, FR-043d)
 - [ ] T082 [P] [US1] Implementar a configuração de backtest por pacote e os mínimos de histórico por modelo em services/forecast-engine/src/forecast_engine/domain/backtest_config.py (D14, FR-043e)
-- [ ] T083 [P] [US1] Implementar o catálogo de métricas WMAPE, MAPE e viés, com comportamento explícito para denominador zero, em services/forecast-engine/src/forecast_engine/domain/metrics.py (FR-036, FR-086)
+- [X] T083 [P] [US1] Implementar o catálogo de métricas WMAPE, MAPE e viés, com comportamento explícito para denominador zero, em services/forecast-engine/src/forecast_engine/domain/metrics.py (FR-036, FR-086)
 - [ ] T084 [US1] Implementar o backtest por `cross_validation` e a seleção do vencedor pela métrica escolhida em services/forecast-engine/src/forecast_engine/domain/model_selection.py (FR-041, FR-042)
 - [ ] T085 [US1] Implementar a restrição do espaço de modelos por sinal dos dados e o registro em `excludedModels` em services/forecast-engine/src/forecast_engine/domain/model_selection.py (D16)
 - [X] T086 [US1] Implementar o piso zero sobre a previsão da série agregada em services/forecast-engine/src/forecast_engine/domain/zero_floor.py (FR-040a, FR-040b)
