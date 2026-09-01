@@ -98,8 +98,8 @@ Monorepo pnpm com serviço Python irmão, conforme a seção *Project Structure*
 
 ### Observabilidade e bordas
 
-- [ ] T039 Implementar geração e propagação de `correlationId` e logger pino JSON em apps/api/src/observability/correlation.ts e logger.ts (Princípio IX)
-- [ ] T040 [P] Expor `/metrics` com prom-client em apps/api/src/observability/metrics.ts
+- [X] T039 Implementar geração e propagação de `correlationId` e logger pino JSON em apps/api/src/observability/correlation.ts e logger.ts (Princípio IX)
+- [X] T040 [P] Expor `/metrics` com prom-client em apps/api/src/observability/metrics.ts
 - [ ] T041 [P] Expor `/metrics` e structlog JSON em services/forecast-engine/src/forecast_engine/adapters/observability.py
 - [ ] T042 [P] Expor `/metrics` e logs JSON em apps/ingestion-worker/src/observability/ e apps/email-worker/src/observability/
 - [X] T043 Escrever teste que executa `packages/domain` sem banco, sem rede e sem servidor, provando o isolamento do domínio, em packages/domain/tests/isolation.test.ts
@@ -116,13 +116,13 @@ Monorepo pnpm com serviço Python irmão, conforme a seção *Project Structure*
 
 ### Aplicação base
 
-- [ ] T051 Implementar o bootstrap do Fastify com plugin de versão `/api/v1` e OpenAPI derivada dos schemas Zod em apps/api/src/app.ts (D9)
-- [ ] T052 Implementar middlewares de rate limiting, paginação e tratamento de erro em apps/api/src/middleware/
-- [ ] T053 Implementar `/api/health` (liveness + Postgres) e `/api/health/ready` (+ RabbitMQ + MinIO) em apps/api/src/routes/health.ts
+- [X] T051 Implementar o bootstrap do Fastify com plugin de versão `/api/v1` e OpenAPI derivada dos schemas Zod em apps/api/src/app.ts (D9)
+- [X] T052 Implementar middlewares de rate limiting, paginação e tratamento de erro em apps/api/src/middleware/
+- [X] T053 Implementar `/api/health` (liveness + Postgres) e `/api/health/ready` (+ RabbitMQ + MinIO) em apps/api/src/routes/health.ts
 - [ ] T054 Configurar BetterAuth com adaptador Prisma e provedor e-mail/senha em apps/api/src/adapters/auth/better-auth.ts (D8)
 - [ ] T055 Implementar o escritor de AuditEvent que grava na MESMA transação da alteração, em apps/api/src/services/audit/audit-writer.ts (FR-099, FR-100)
 - [ ] T056 Escrever teste provando que uma alteração sem AuditEvent na mesma transação é rejeitada, em apps/api/tests/integration/audit-transaction.test.ts
-- [ ] T057 Implementar o container de composição e as portas (`ForecastJobPublisher`, `DatasetStore`, `ScenarioRepository`, `Mailer`) em apps/api/src/composition/ (Princípio IV)
+- [X] T057 Implementar o container de composição e as portas (`ForecastJobPublisher`, `DatasetStore`, `ScenarioRepository`, `Mailer`) em apps/api/src/composition/ (Princípio IV)
 - [ ] T058 Implementar o esqueleto em camadas do motor (`messaging → application → domain`) em services/forecast-engine/src/forecast_engine/, sem lógica de cálculo ainda
 - [ ] T059 Implementar warm-up do numba no boot do motor em services/forecast-engine/src/forecast_engine/application/warmup.py (D18)
 - [ ] T060 Implementar limitação de `n_jobs` pelo limite de CPU do contêiner em services/forecast-engine/src/forecast_engine/application/parallelism.py (D18)
