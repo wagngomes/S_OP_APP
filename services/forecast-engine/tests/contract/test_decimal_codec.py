@@ -12,12 +12,12 @@ from pathlib import Path
 
 import pytest
 
+from forecast_engine.domain.proration import prorate
 from forecast_engine.domain.decimal_codec import (
     DECIMAL_SCALE,
     canonical,
     is_decimal_string,
     parse_decimal_string,
-    prorate,
     quantize,
 )
 
