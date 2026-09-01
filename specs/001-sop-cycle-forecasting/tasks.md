@@ -175,7 +175,7 @@ previsão consistente, sem nenhuma das outras histórias.
 - [X] T086 [US1] Implementar o piso zero sobre a previsão da série agregada em services/forecast-engine/src/forecast_engine/domain/zero_floor.py (FR-040a, FR-040b)
 - [X] T087 [US1] Implementar o rateio por representatividade com fechamento por maior resto em services/forecast-engine/src/forecast_engine/domain/proration.py (FR-045, FR-046)
 - [X] T088 [US1] Implementar o comportamento para representatividade zero no período de rateio em services/forecast-engine/src/forecast_engine/domain/proration.py (FR-047)
-- [ ] T089 [US1] Implementar a orquestração do job (ler, preparar, calcular, ratear, quantizar, gravar) em services/forecast-engine/src/forecast_engine/application/forecast_job.py
+- [X] T089 [US1] Implementar a orquestração do job (ler, preparar, calcular, ratear, quantizar, gravar) em services/forecast-engine/src/forecast_engine/application/forecast_job.py
 - [ ] T090 [US1] Implementar a escrita de output.parquet, series.parquet e do marcador `_SUCCESS` em services/forecast-engine/src/forecast_engine/application/result_writer.py (D18)
 - [ ] T091 [US1] Implementar o consumidor de `sop.forecast.request.v1` e o publicador de `sop.forecast.result.v1` em services/forecast-engine/src/forecast_engine/messaging/forecast_consumer.py
 - [ ] T092 [US1] Implementar o processamento em lotes para respeitar o limite de memória em services/forecast-engine/src/forecast_engine/application/batching.py

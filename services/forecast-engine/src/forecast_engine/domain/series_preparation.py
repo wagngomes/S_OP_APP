@@ -61,3 +61,11 @@ def prepare_series(points: Mapping[Period, Decimal]) -> list[tuple[Period, Decim
 
     last_period = ordered[-1][0]
     return [(p, points.get(p, ZERO)) for p in month_range(first_movement, last_period)]
+
+
+def next_periods(last: Period, count: int) -> list[Period]:
+    """Os `count` meses seguintes a `last` — o horizonte da previsão (FR-040)."""
+    if count < 1:
+        return []
+    start = _index(last) + 1
+    return [_period(i) for i in range(start, start + count)]
