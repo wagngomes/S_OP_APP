@@ -225,15 +225,15 @@ equipe, verificar o aviso ao aprovador e que a colaboração só abre após a ap
 
 ### Tests for User Story 2
 
-- [ ] T115 [P] [US2] Teste unitário da matriz papel × fase × ação em packages/domain/tests/scenario/authorization.test.ts (D8)
+- [X] T115 [P] [US2] Teste unitário da matriz papel × fase × ação em packages/domain/tests/scenario/authorization.test.ts (D8)
 - [ ] T116 [P] [US2] Teste de integração do fechamento de equipe sem aprovador respondendo 409 em apps/api/tests/integration/close-team-failures.test.ts (FR-015)
 - [ ] T117 [P] [US2] Teste de integração provando que colaborador não altera número antes da aprovação em apps/api/tests/integration/approval-gate.test.ts
 - [ ] T118 [P] [US2] Teste de contrato das rotas de membros e aprovação em apps/api/tests/contract/team-approval.contract.test.ts
 
 ### Implementation for User Story 2
 
-- [ ] T119 [P] [US2] Implementar as regras de papel e a autorização por fase como funções puras em packages/domain/src/scenario/authorization.ts (D8)
-- [ ] T120 [P] [US2] Implementar a regra de palavra final com default no criador em packages/domain/src/scenario/final-say.ts (FR-011, FR-012)
+- [X] T119 [P] [US2] Implementar as regras de papel e a autorização por fase como funções puras em packages/domain/src/scenario/authorization.ts (D8)
+- [X] T120 [P] [US2] Implementar a regra de palavra final com default no criador em packages/domain/src/scenario/final-say.ts (FR-011, FR-012)
 - [ ] T121 [US2] Implementar convite de membros com vínculo por e-mail ainda sem conta em apps/api/src/services/membership.service.ts (FR-009, FR-018)
 - [ ] T122 [US2] Implementar as rotas de membros em apps/api/src/routes/v1/members.routes.ts
 - [ ] T123 [US2] Implementar o fechamento de equipe exigindo aprovador e travando a composição em apps/api/src/services/team.service.ts (FR-013, FR-014, FR-015)
@@ -256,16 +256,16 @@ planilha; ambos concluem e a fase encerra com as duas contribuições registrada
 
 ### Tests for User Story 3
 
-- [ ] T128 [P] [US3] Teste unitário da recusa de ajuste sem motivo em packages/domain/tests/collaboration/adjustment.test.ts (FR-058)
-- [ ] T129 [P] [US3] Teste unitário do encadeamento de versões na edição concorrente em packages/domain/tests/collaboration/concurrency.test.ts (FR-066a)
+- [X] T128 [P] [US3] Teste unitário da recusa de ajuste sem motivo em packages/domain/tests/collaboration/adjustment.test.ts (FR-058)
+- [X] T129 [P] [US3] Teste unitário do encadeamento de versões na edição concorrente em packages/domain/tests/collaboration/concurrency.test.ts (FR-066a)
 - [ ] T130 [P] [US3] Teste de integração da planilha devolvida com estrutura alterada sendo recusada integralmente, sem aplicação parcial, em apps/api/tests/integration/sheet-rejection.test.ts (FR-062)
 - [ ] T131 [P] [US3] Teste de integração da planilha antiga sinalizando itens já alterados por terceiros em apps/api/tests/integration/sheet-stale.test.ts (FR-066c)
 - [ ] T132 [P] [US3] Teste de integração do encerramento automático quando todos concluem em apps/api/tests/integration/collaboration-close.test.ts (FR-064)
 
 ### Implementation for User Story 3
 
-- [ ] T133 [P] [US3] Implementar as regras de ajuste com motivo obrigatório e preservação do calculado em packages/domain/src/collaboration/adjustment.ts (FR-057, FR-058, FR-059)
-- [ ] T134 [P] [US3] Implementar a resolução determinística de edição concorrente via `supersededById` em packages/domain/src/collaboration/concurrency.ts (FR-066a)
+- [X] T133 [P] [US3] Implementar as regras de ajuste com motivo obrigatório e preservação do calculado em packages/domain/src/collaboration/adjustment.ts (FR-057, FR-058, FR-059)
+- [X] T134 [P] [US3] Implementar a resolução determinística de edição concorrente via `supersededById` em packages/domain/src/collaboration/concurrency.ts (FR-066a)
 - [ ] T135 [US3] Implementar o service de colaboração gravando ajuste e AuditEvent na mesma transação em apps/api/src/services/collaboration.service.ts (FR-099)
 - [ ] T136 [US3] Implementar as rotas de colaboração, incluindo `expectedVersion` e resposta 409 `ITEM_CHANGED`, em apps/api/src/routes/v1/collaboration.routes.ts (FR-066b)
 - [ ] T137 [US3] Implementar a geração da planilha do cenário e a URL assinada do MinIO em apps/api/src/services/collaboration-sheet.service.ts (FR-060)
@@ -290,15 +290,15 @@ publicado é o consensado.
 
 ### Tests for User Story 4
 
-- [ ] T143 [P] [US4] Teste unitário do cálculo de divergência e da classificação dentro/fora da faixa em packages/domain/tests/consensus/divergence.test.ts (FR-067, FR-068)
+- [X] T143 [P] [US4] Teste unitário do cálculo de divergência e da classificação dentro/fora da faixa em packages/domain/tests/consensus/divergence.test.ts (FR-067, FR-068)
 - [ ] T144 [P] [US4] Teste de integração recusando decisão de quem não é o responsável em apps/api/tests/integration/consensus-authorization.test.ts (FR-071)
 - [ ] T145 [P] [US4] Teste de integração recusando publicação com item sem decisão em apps/api/tests/integration/publish-gate.test.ts (FR-073)
 - [ ] T146 [P] [US4] Teste de integração provando a imutabilidade do publicado em apps/api/tests/integration/published-immutability.test.ts (FR-076)
 
 ### Implementation for User Story 4
 
-- [ ] T147 [P] [US4] Implementar divergência, faixa absoluta e percentual em packages/domain/src/consensus/divergence.ts (FR-067, FR-068)
-- [ ] T148 [P] [US4] Implementar a regra de quem decide em packages/domain/src/consensus/decision-rules.ts (FR-071)
+- [X] T147 [P] [US4] Implementar divergência, faixa absoluta e percentual em packages/domain/src/consensus/divergence.ts (FR-067, FR-068)
+- [X] T148 [P] [US4] Implementar a regra de quem decide em packages/domain/src/consensus/decision-rules.ts (FR-071)
 - [ ] T149 [US4] Implementar o service de consenso com registro de autor, origem e deltas em apps/api/src/services/consensus.service.ts (FR-070, FR-072)
 - [ ] T150 [US4] Implementar as rotas de tolerância, listagem ordenável por `delta_desc` e decisão em apps/api/src/routes/v1/consensus.routes.ts (FR-069)
 - [ ] T151 [US4] Implementar a publicação copiando o consensado para PublishedForecast e avançando a fase em apps/api/src/services/publication.service.ts (FR-074, FR-075)

@@ -71,3 +71,47 @@ export {
   type ConsolidationResult,
   type RawSalesRow,
 } from './ingestion/deduplicate.js';
+
+// --- Autorização de processo ------------------------------------------------
+export {
+  canPerform,
+  hasFinalSay,
+  type AuthorizationContext,
+  type AuthorizationResult,
+  type FinalSayRole,
+  type MemberRole,
+} from './scenario/authorization.js';
+
+// --- Colaboração ------------------------------------------------------------
+export {
+  validateAdjustment,
+  type AdjustmentInput,
+  type AdjustmentIssue,
+} from './collaboration/adjustment.js';
+
+export {
+  checkItemVersion,
+  currentAdjustment,
+  supersede,
+  type AdjustmentOrigin,
+  type AdjustmentRecord,
+  type VersionCheck,
+} from './collaboration/concurrency.js';
+
+// --- Consenso ---------------------------------------------------------------
+export {
+  computeDivergence,
+  isWithinTolerance,
+  sortByDivergence,
+  type Divergence,
+  type DivergenceItem,
+  type Tolerance,
+  type ToleranceKind,
+} from './consensus/divergence.js';
+
+export {
+  validateDecision,
+  type ConsensusSource,
+  type DecisionInput,
+  type DecisionIssue,
+} from './consensus/decision-rules.js';
