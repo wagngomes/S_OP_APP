@@ -100,19 +100,19 @@ Monorepo pnpm com serviço Python irmão, conforme a seção *Project Structure*
 
 - [X] T039 Implementar geração e propagação de `correlationId` e logger pino JSON em apps/api/src/observability/correlation.ts e logger.ts (Princípio IX)
 - [X] T040 [P] Expor `/metrics` com prom-client em apps/api/src/observability/metrics.ts
-- [ ] T041 [P] Expor `/metrics` e structlog JSON em services/forecast-engine/src/forecast_engine/adapters/observability.py
-- [ ] T042 [P] Expor `/metrics` e logs JSON em apps/ingestion-worker/src/observability/ e apps/email-worker/src/observability/
+- [X] T041 [P] Expor `/metrics` e structlog JSON em services/forecast-engine/src/forecast_engine/adapters/observability.py
+- [X] T042 [P] Expor `/metrics` e logs JSON em apps/ingestion-worker/src/observability/ e apps/email-worker/src/observability/
 - [X] T043 Escrever teste que executa `packages/domain` sem banco, sem rede e sem servidor, provando o isolamento do domínio, em packages/domain/tests/isolation.test.ts
 
 ### Mensageria e armazenamento
 
-- [ ] T044 Declarar exchanges, filas e DLX conforme a topologia de contracts/messaging.md em apps/api/src/adapters/rabbitmq/topology.ts
-- [ ] T045 Escrever teste de integração da topologia com RabbitMQ real via Testcontainers em apps/api/tests/integration/rabbitmq-topology.test.ts
-- [ ] T046 Implementar helper de consumidor idempotente (unicidade por jobId, transição de status condicional, ack em entrega duplicada) em apps/api/src/adapters/rabbitmq/idempotent-consumer.ts (D6)
-- [ ] T047 Escrever teste de integração provando que a reentrega da mesma mensagem não duplica resultado, em apps/api/tests/integration/idempotency.test.ts
-- [ ] T048 [P] Implementar adaptador MinIO em streaming, com escrita do marcador `_SUCCESS`, em apps/api/src/adapters/minio/object-store.ts (D18)
-- [ ] T049 [P] Implementar adaptador MinIO do motor em services/forecast-engine/src/forecast_engine/adapters/object_store.py
-- [ ] T050 [P] Implementar retentativa com backoff exponencial e roteamento para DLQ em apps/api/src/adapters/rabbitmq/retry.ts
+- [X] T044 Declarar exchanges, filas e DLX conforme a topologia de contracts/messaging.md em apps/api/src/adapters/rabbitmq/topology.ts
+- [X] T045 Escrever teste de integração da topologia com RabbitMQ real via Testcontainers em apps/api/tests/integration/rabbitmq-topology.test.ts
+- [X] T046 Implementar helper de consumidor idempotente (unicidade por jobId, transição de status condicional, ack em entrega duplicada) em apps/api/src/adapters/rabbitmq/idempotent-consumer.ts (D6)
+- [X] T047 Escrever teste de integração provando que a reentrega da mesma mensagem não duplica resultado, em apps/api/tests/integration/idempotency.test.ts
+- [X] T048 [P] Implementar adaptador MinIO em streaming, com escrita do marcador `_SUCCESS`, em apps/api/src/adapters/minio/object-store.ts (D18)
+- [X] T049 [P] Implementar adaptador MinIO do motor em services/forecast-engine/src/forecast_engine/adapters/object_store.py
+- [X] T050 [P] Implementar retentativa com backoff exponencial e roteamento para DLQ em apps/api/src/adapters/rabbitmq/retry.ts
 
 ### Aplicação base
 
