@@ -12,7 +12,7 @@ Projeto conduzido pelo fluxo Spec Kit. As quatro etapas de planejamento estão
 Tarefas concluídas estão marcadas `[X]`. Ao retomar, leia esse arquivo primeiro e
 continue pela primeira tarefa não marcada que faça sentido na ordem de fases.
 
-Estado no último commit desta máquina: **72 de 198 tarefas, 432 testes passando.**
+Estado no último commit desta máquina: **82 de 198 tarefas, 432 testes passando.**
 
 ## Ordem de leitura ao retomar
 
@@ -82,17 +82,23 @@ Aplicar o piso zero depois do rateio quebra a conservação de soma.
   `services/forecast-engine`.
 - Rodar testes: `pnpm -r test` e, no motor, `PYTHONPATH=src pytest -q`.
 
-**Docker**: a máquina onde a maior parte deste código foi escrita não tinha
-Docker, e por isso os Dockerfiles e o `docker-compose.yml` (T030–T038) ainda não
-existem. Se a máquina atual tiver Docker, esse é um bom próximo passo — escreva-os
-e **construa-os na hora**, em vez de deixá-los sem verificação.
+**Docker**: todos os Dockerfiles e o `docker-compose.yml` (T030–T038) estão prontos
+e verificados (`docker compose build` passou, exit 0). As cinco imagens:
+- `sop-app-api` 771 MB — Alpine 4-stage, pnpm deploy --prod, Prisma migrate no boot
+- `sop-app-ingestion-worker` 334 MB — Alpine 4-stage
+- `sop-app-email-worker` 343 MB — Alpine 4-stage
+- `sop-app-web` 243 MB — Alpine 4-stage, Next.js 15 standalone
+- `sop-app-forecast-engine` 694 MB — python:3.12-slim 2-stage, venv isolado
+
+**Atenção**: `**/node_modules/` no `.dockerignore` é crítico — sem o `**` os
+junctions do Windows sobrescrevem os symlinks do pnpm no container Alpine.
 
 ## O que ainda não existe
 
-Worker de ingestão, worker de e-mail, frontend, adaptadores de Prisma/RabbitMQ/
-MinIO, Dockerfiles e compose, e as rotas do ciclo (aprovação, colaboração,
-consenso, publicação) — cujas **regras de negócio já estão prontas e testadas** em
-`packages/domain`; falta a fiação HTTP sobre elas.
+Worker de ingestão, worker de e-mail, adaptadores de Prisma/RabbitMQ/MinIO,
+e as rotas do ciclo (aprovação, colaboração, consenso, publicação) — cujas
+**regras de negócio já estão prontas e testadas** em `packages/domain`; falta
+a fiação HTTP sobre elas. Frontend tem scaffold mínimo (homepage).
 
-Cerca de 25 tarefas dependem de Docker para serem verificadas: integração com
-Testcontainers, compose e o roteiro do `quickstart.md`.
+Tarefas prioritárias restantes: T041-T042 (observabilidade workers), T043-T044
+(Prisma/RabbitMQ adapters na API), T058-T059 (forecast-engine main + warmup).
