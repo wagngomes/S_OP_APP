@@ -1,0 +1,27 @@
+# T036 — Scrape dos quatro processos de longa duração (Princípio IX)
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    app: sop-app
+
+scrape_configs:
+  - job_name: sop_api
+    static_configs:
+      - targets: ['api:3001']
+    metrics_path: /metrics
+
+  - job_name: sop_ingestion_worker
+    static_configs:
+      - targets: ['ingestion-worker:9100']
+    metrics_path: /metrics
+
+  - job_name: sop_email_worker
+    static_configs:
+      - targets: ['email-worker:9101']
+    metrics_path: /metrics
+
+  - job_name: sop_forecast_engine
+    static_configs:
+      - targets: ['forecast-engine:9102']
+    metrics_path: /metrics

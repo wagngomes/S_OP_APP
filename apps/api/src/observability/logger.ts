@@ -9,7 +9,7 @@ import type { FastifyServerOptions } from 'fastify';
  * Campos sensíveis são redigidos: log é operacional e vai para agregador; senha,
  * cookie e token não podem viajar junto.
  */
-export function loggerOptions(): FastifyServerOptions['logger'] {
+export function loggerOptions(): NonNullable<FastifyServerOptions['logger']> {
   return {
     level: process.env.LOG_LEVEL ?? 'info',
     redact: {

@@ -1,0 +1,267 @@
+# T035 — Stack completa: infraestrutura + cinco serviços de aplicação
+# Sobe com: docker compose up --build
+#
+# mem_limit dos serviços Node coerente com NODE_OPTIONS --max-old-space-size=1536
+# (heap de 1,5 GB + overhead do processo ≈ 2 GB).
+# Motor Python processa em lotes (D18); 4 GB comportam pandas + numpy em séries grandes.
+
+name: sop-app
+
+services:
+  # ─── Infraestrutura ──────────────────────────────────────────────
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sop}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-troque-em-producao}
+      POSTGRES_DB: ${POSTGRES_DB:-sop}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sop} -d ${POSTGRES_DB:-sop}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    mem_limit: 1g
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-sop}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-troque-em-producao}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    mem_limit: 512m
+
+  minio:
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-sop}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-troque-em-producao}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    mem_limit: 512m
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.enable-lifecycle
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    mem_limit: 256m
+
+  loki:
+    image: grafana/loki:3.3.2
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki.yml
+    volumes:
+      - ./infra/loki/loki.yml:/etc/loki/loki.yml:ro
+      - loki_data:/loki
+    ports:
+      - "${LOKI_PORT:-3100}:3100"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    mem_limit: 256m
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-troque-em-producao}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_LOG_LEVEL: warn
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT:-3002}:3000"
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    mem_limit: 256m
+
+  # ─── Aplicação ───────────────────────────────────────────────────
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      API_PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-sop}:${POSTGRES_PASSWORD:-troque-em-producao}@postgres:5432/${POSTGRES_DB:-sop}?schema=public
+      AMQP_URL: amqp://${RABBITMQ_DEFAULT_USER:-sop}:${RABBITMQ_DEFAULT_PASS:-troque-em-producao}@rabbitmq:5672
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-sop}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-troque-em-producao}
+      S3_BUCKET: ${MINIO_BUCKET:-sop}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-gere-um-segredo-de-32-bytes}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3001}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-300}
+      RATE_LIMIT_WINDOW: ${RATE_LIMIT_WINDOW:-1 minute}
+      NODE_OPTIONS: "--max-old-space-size=1536"
+    ports:
+      - "${API_PORT:-3001}:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    mem_limit: 2g
+
+  ingestion-worker:
+    build:
+      context: .
+      dockerfile: apps/ingestion-worker/Dockerfile
+    restart: unless-stopped
+    environment:
+      AMQP_URL: amqp://${RABBITMQ_DEFAULT_USER:-sop}:${RABBITMQ_DEFAULT_PASS:-troque-em-producao}@rabbitmq:5672
+      DATABASE_URL: postgresql://${POSTGRES_USER:-sop}:${POSTGRES_PASSWORD:-troque-em-producao}@postgres:5432/${POSTGRES_DB:-sop}?schema=public
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-sop}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-troque-em-producao}
+      S3_BUCKET: ${MINIO_BUCKET:-sop}
+      INGESTION_PREFETCH: ${INGESTION_PREFETCH:-10}
+      INGESTION_ISSUE_CAP: ${INGESTION_ISSUE_CAP:-10000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      NODE_OPTIONS: "--max-old-space-size=1536"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    mem_limit: 2g
+
+  email-worker:
+    build:
+      context: .
+      dockerfile: apps/email-worker/Dockerfile
+    restart: unless-stopped
+    environment:
+      AMQP_URL: amqp://${RABBITMQ_DEFAULT_USER:-sop}:${RABBITMQ_DEFAULT_PASS:-troque-em-producao}@rabbitmq:5672
+      RESEND_API_KEY: ${RESEND_API_KEY:-re_troque_pela_sua_chave}
+      EMAIL_FROM: ${EMAIL_FROM:-nao-responda@exemplo.com}
+      EMAIL_MAX_ATTEMPTS: ${EMAIL_MAX_ATTEMPTS:-3}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      NODE_OPTIONS: "--max-old-space-size=256"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    mem_limit: 512m
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/api/v1}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    mem_limit: 1g
+
+  forecast-engine:
+    build:
+      context: .
+      dockerfile: services/forecast-engine/Dockerfile
+    restart: unless-stopped
+    environment:
+      AMQP_URL: amqp://${RABBITMQ_DEFAULT_USER:-sop}:${RABBITMQ_DEFAULT_PASS:-troque-em-producao}@rabbitmq:5672
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-sop}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-troque-em-producao}
+      S3_BUCKET: ${MINIO_BUCKET:-sop}
+      ENGINE_METRICS_PORT: ${ENGINE_METRICS_PORT:-9102}
+      ENGINE_PREFETCH: ${ENGINE_PREFETCH:-1}
+      ENGINE_MAX_JOBS: ${ENGINE_MAX_JOBS:-4}
+      MODEL_CATALOG_VERSION: ${MODEL_CATALOG_VERSION:-2026.08}
+      NUMBA_CACHE_DIR: /app/.numba_cache
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - numba_cache:/app/.numba_cache
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    mem_limit: 4g
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  minio_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+  numba_cache:

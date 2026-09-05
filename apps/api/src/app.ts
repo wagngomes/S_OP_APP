@@ -34,8 +34,8 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
     logger: deps.logger ?? loggerOptions(),
     // A correlação é o próprio reqId, para aparecer em TODA linha de log —
     // inclusive na primeira, emitida antes de qualquer hook rodar.
-    genReqId: (request) => correlationIdFrom(request as never),
-  }).withTypeProvider<ZodTypeProvider>();
+    genReqId: correlationIdFrom,
+  });
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);

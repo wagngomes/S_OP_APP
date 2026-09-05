@@ -46,7 +46,7 @@ Monorepo pnpm com serviço Python irmão, conforme a seção *Project Structure*
 - [X] T004 [P] Inicializar `apps/api` com package.json, tsconfig.json e vitest.config.ts
 - [X] T005 [P] Inicializar `apps/ingestion-worker` com package.json, tsconfig.json e vitest.config.ts
 - [X] T006 [P] Inicializar `apps/email-worker` com package.json, tsconfig.json e vitest.config.ts
-- [ ] T007 [P] Inicializar `apps/web` com Next.js 15 App Router e Tailwind CSS em apps/web/package.json
+- [X] T007 [P] Inicializar `apps/web` com Next.js 15 App Router e Tailwind CSS em apps/web/package.json
 - [X] T008 [P] Configurar a paleta como tokens semânticos (turquesa, petroleo, branco, grafite, verde, cinza) em apps/web/tailwind.config.ts, conforme D19 de research.md
 - [X] T009 [P] Inicializar `services/forecast-engine` com pyproject.toml, dependências StatsForecast/pandas/pika/boto3/pydantic e configuração do pytest
 - [X] T010 [P] Configurar ESLint e Prettier na raiz em eslint.config.js e .prettierrc
@@ -86,15 +86,15 @@ Monorepo pnpm com serviço Python irmão, conforme a seção *Project Structure*
 
 ### Contêineres e orquestração
 
-- [ ] T030 [P] Criar apps/api/Dockerfile multi-stage Alpine, com `--max-old-space-size=1536` (valor em MB, sem sufixo)
-- [ ] T031 [P] Criar apps/ingestion-worker/Dockerfile multi-stage Alpine
-- [ ] T032 [P] Criar apps/email-worker/Dockerfile multi-stage Alpine
-- [ ] T033 [P] Criar apps/web/Dockerfile multi-stage Alpine com build standalone do Next.js
-- [ ] T034 [P] Criar services/forecast-engine/Dockerfile multi-stage sobre `python:3.12-slim` com `NUMBA_CACHE_DIR` persistido (D4, D18)
-- [ ] T035 Criar docker-compose.yml na raiz com Postgres, RabbitMQ, MinIO, Prometheus, Grafana, Loki e os cinco serviços da aplicação, com healthchecks e `depends_on: service_healthy`, e `mem_limit` coerente com a flag do Node
-- [ ] T036 [P] Configurar o scrape dos quatro processos de longa duração em infra/prometheus/prometheus.yml
-- [ ] T037 [P] Provisionar datasources e painéis iniciais em infra/grafana/provisioning/
-- [ ] T038 [P] Configurar agregação de logs em infra/loki/
+- [X] T030 [P] Criar apps/api/Dockerfile multi-stage Alpine, com `--max-old-space-size=1536` (valor em MB, sem sufixo)
+- [X] T031 [P] Criar apps/ingestion-worker/Dockerfile multi-stage Alpine
+- [X] T032 [P] Criar apps/email-worker/Dockerfile multi-stage Alpine
+- [X] T033 [P] Criar apps/web/Dockerfile multi-stage Alpine com build standalone do Next.js
+- [X] T034 [P] Criar services/forecast-engine/Dockerfile multi-stage sobre `python:3.12-slim` com `NUMBA_CACHE_DIR` persistido (D4, D18)
+- [X] T035 Criar docker-compose.yml na raiz com Postgres, RabbitMQ, MinIO, Prometheus, Grafana, Loki e os cinco serviços da aplicação, com healthchecks e `depends_on: service_healthy`, e `mem_limit` coerente com a flag do Node
+- [X] T036 [P] Configurar o scrape dos quatro processos de longa duração em infra/prometheus/prometheus.yml
+- [X] T037 [P] Provisionar datasources e painéis iniciais em infra/grafana/provisioning/
+- [X] T038 [P] Configurar agregação de logs em infra/loki/
 
 ### Observabilidade e bordas
 

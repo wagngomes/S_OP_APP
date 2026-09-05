@@ -20,6 +20,7 @@
     "@fastify/swagger": "^9.4.0",
     "@fastify/swagger-ui": "^5.2.0",
     "@prisma/client": "^6.1.0",
+    "prisma": "^6.1.0",
     "@sop/contracts": "workspace:*",
     "@sop/domain": "workspace:*",
     "amqplib": "^0.10.5",
@@ -33,7 +34,6 @@
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.6",
-    "prisma": "^6.1.0",
     "testcontainers": "^10.16.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
