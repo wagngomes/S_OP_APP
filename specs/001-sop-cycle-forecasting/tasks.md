@@ -119,13 +119,13 @@ Monorepo pnpm com serviço Python irmão, conforme a seção *Project Structure*
 - [X] T051 Implementar o bootstrap do Fastify com plugin de versão `/api/v1` e OpenAPI derivada dos schemas Zod em apps/api/src/app.ts (D9)
 - [X] T052 Implementar middlewares de rate limiting, paginação e tratamento de erro em apps/api/src/middleware/
 - [X] T053 Implementar `/api/health` (liveness + Postgres) e `/api/health/ready` (+ RabbitMQ + MinIO) em apps/api/src/routes/health.ts
-- [ ] T054 Configurar BetterAuth com adaptador Prisma e provedor e-mail/senha em apps/api/src/adapters/auth/better-auth.ts (D8)
-- [ ] T055 Implementar o escritor de AuditEvent que grava na MESMA transação da alteração, em apps/api/src/services/audit/audit-writer.ts (FR-099, FR-100)
-- [ ] T056 Escrever teste provando que uma alteração sem AuditEvent na mesma transação é rejeitada, em apps/api/tests/integration/audit-transaction.test.ts
+- [X] T054 Configurar BetterAuth com adaptador Prisma e provedor e-mail/senha em apps/api/src/adapters/auth/better-auth.ts (D8)
+- [X] T055 Implementar o escritor de AuditEvent que grava na MESMA transação da alteração, em apps/api/src/services/audit/audit-writer.ts (FR-099, FR-100)
+- [X] T056 Escrever teste provando que uma alteração sem AuditEvent na mesma transação é rejeitada, em apps/api/tests/integration/audit-transaction.test.ts
 - [X] T057 Implementar o container de composição e as portas (`ForecastJobPublisher`, `DatasetStore`, `ScenarioRepository`, `Mailer`) em apps/api/src/composition/ (Princípio IV)
-- [ ] T058 Implementar o esqueleto em camadas do motor (`messaging → application → domain`) em services/forecast-engine/src/forecast_engine/, sem lógica de cálculo ainda
-- [ ] T059 Implementar warm-up do numba no boot do motor em services/forecast-engine/src/forecast_engine/application/warmup.py (D18)
-- [ ] T060 Implementar limitação de `n_jobs` pelo limite de CPU do contêiner em services/forecast-engine/src/forecast_engine/application/parallelism.py (D18)
+- [X] T058 Implementar o esqueleto em camadas do motor (`messaging → application → domain`) em services/forecast-engine/src/forecast_engine/, sem lógica de cálculo ainda
+- [X] T059 Implementar warm-up do numba no boot do motor em services/forecast-engine/src/forecast_engine/application/warmup.py (D18)
+- [X] T060 Implementar limitação de `n_jobs` pelo limite de CPU do contêiner em services/forecast-engine/src/forecast_engine/application/parallelism.py (D18)
 
 **Checkpoint**: fundação pronta — as histórias podem começar
 
@@ -164,7 +164,7 @@ previsão consistente, sem nenhuma das outras histórias.
 
 ### Motor de cálculo (Python)
 
-- [ ] T078 [P] [US1] Implementar a leitura do dataset Parquet com colunas numéricas em string decimal em services/forecast-engine/src/forecast_engine/application/dataset_reader.py (D5)
+- [X] T078 [P] [US1] Implementar a leitura do dataset Parquet com colunas numéricas em string decimal em services/forecast-engine/src/forecast_engine/application/dataset_reader.py (D5)
 - [X] T079 [US1] Implementar a agregação do histórico até a combinação de níveis em services/forecast-engine/src/forecast_engine/domain/aggregation.py (FR-039)
 - [X] T080 [US1] Implementar o preenchimento de lacunas internas e o corte do prefixo pré-primeira-venda em services/forecast-engine/src/forecast_engine/domain/series_preparation.py (FR-040d, D15)
 - [X] T081 [P] [US1] Implementar o catálogo de modelos nos três pacotes Rápido/Standard/Completo em services/forecast-engine/src/forecast_engine/domain/model_catalog.py (D1, FR-043d)
@@ -176,8 +176,8 @@ previsão consistente, sem nenhuma das outras histórias.
 - [X] T087 [US1] Implementar o rateio por representatividade com fechamento por maior resto em services/forecast-engine/src/forecast_engine/domain/proration.py (FR-045, FR-046)
 - [X] T088 [US1] Implementar o comportamento para representatividade zero no período de rateio em services/forecast-engine/src/forecast_engine/domain/proration.py (FR-047)
 - [X] T089 [US1] Implementar a orquestração do job (ler, preparar, calcular, ratear, quantizar, gravar) em services/forecast-engine/src/forecast_engine/application/forecast_job.py
-- [ ] T090 [US1] Implementar a escrita de output.parquet, series.parquet e do marcador `_SUCCESS` em services/forecast-engine/src/forecast_engine/application/result_writer.py (D18)
-- [ ] T091 [US1] Implementar o consumidor de `sop.forecast.request.v1` e o publicador de `sop.forecast.result.v1` em services/forecast-engine/src/forecast_engine/messaging/forecast_consumer.py
+- [X] T090 [US1] Implementar a escrita de output.parquet, series.parquet e do marcador `_SUCCESS` em services/forecast-engine/src/forecast_engine/application/result_writer.py (D18)
+- [X] T091 [US1] Implementar o consumidor de `sop.forecast.request.v1` e o publicador de `sop.forecast.result.v1` em services/forecast-engine/src/forecast_engine/messaging/forecast_consumer.py
 - [ ] T092 [US1] Implementar o processamento em lotes para respeitar o limite de memória em services/forecast-engine/src/forecast_engine/application/batching.py
 - [ ] T093 [US1] Implementar a republicação do resultado quando o `_SUCCESS` já existe, em vez de recalcular, em services/forecast-engine/src/forecast_engine/messaging/forecast_consumer.py (D6)
 

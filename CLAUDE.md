@@ -12,7 +12,7 @@ Projeto conduzido pelo fluxo Spec Kit. As quatro etapas de planejamento estão
 Tarefas concluídas estão marcadas `[X]`. Ao retomar, leia esse arquivo primeiro e
 continue pela primeira tarefa não marcada que faça sentido na ordem de fases.
 
-Estado no último commit desta máquina: **82 de 198 tarefas, 432 testes passando.**
+Estado no último commit desta máquina: **94 de 198 tarefas, 445 testes passando.**
 
 ## Ordem de leitura ao retomar
 
@@ -95,10 +95,15 @@ junctions do Windows sobrescrevem os symlinks do pnpm no container Alpine.
 
 ## O que ainda não existe
 
-Worker de ingestão, worker de e-mail, adaptadores de Prisma/RabbitMQ/MinIO,
-e as rotas do ciclo (aprovação, colaboração, consenso, publicação) — cujas
-**regras de negócio já estão prontas e testadas** em `packages/domain`; falta
-a fiação HTTP sobre elas. Frontend tem scaffold mínimo (homepage).
+Worker de ingestão, worker de e-mail, e as rotas do ciclo (aprovação,
+colaboração, consenso, publicação) — cujas **regras de negócio já estão prontas
+e testadas** em `packages/domain`; falta a fiação HTTP sobre elas. Frontend tem
+scaffold mínimo (homepage).
 
-Tarefas prioritárias restantes: T041-T042 (observabilidade workers), T043-T044
-(Prisma/RabbitMQ adapters na API), T058-T059 (forecast-engine main + warmup).
+**Fase 2 concluída** — checkpoint "fundação pronta" atingido (T054-T060, T078, T090-T091).
+Próximas tarefas: Phase 3 (US1) — T061 (contrato auth), T069 (contrato mensagens),
+T070 (upload 202), T071 (worker issue report), T072 (end-to-end US1), T094 (rotas auth).
+
+**Nota Windows**: spawnSync com process.execPath falha via Bash tool (symlink nvm4w).
+Usar `'node'` como comando (PATH) + `shell: false` em testes de integração que precisam
+rodar subprocessos. Ver audit-transaction.test.ts como referência.
