@@ -12,7 +12,7 @@ Projeto conduzido pelo fluxo Spec Kit. As quatro etapas de planejamento estão
 Tarefas concluídas estão marcadas `[X]`. Ao retomar, leia esse arquivo primeiro e
 continue pela primeira tarefa não marcada que faça sentido na ordem de fases.
 
-Estado no último commit desta máquina: **94 de 198 tarefas, 445 testes passando.**
+Estado no último commit desta máquina: **113 de 198 tarefas, 525 testes passando.**
 
 ## Ordem de leitura ao retomar
 
@@ -95,14 +95,28 @@ junctions do Windows sobrescrevem os symlinks do pnpm no container Alpine.
 
 ## O que ainda não existe
 
-Worker de ingestão, worker de e-mail, e as rotas do ciclo (aprovação,
-colaboração, consenso, publicação) — cujas **regras de negócio já estão prontas
-e testadas** em `packages/domain`; falta a fiação HTTP sobre elas. Frontend tem
-scaffold mínimo (homepage).
+Worker de e-mail e as rotas do ciclo de aprovação/colaboração/consenso/publicação —
+cujas **regras de negócio já estão prontas e testadas** em `packages/domain`; falta
+a fiação HTTP sobre elas. Frontend tem telas de auth e cenários; falta upload,
+parametrização, resultado.
 
-**Fase 2 concluída** — checkpoint "fundação pronta" atingido (T054-T060, T078, T090-T091).
-Próximas tarefas: Phase 3 (US1) — T061 (contrato auth), T069 (contrato mensagens),
-T070 (upload 202), T071 (worker issue report), T072 (end-to-end US1), T094 (rotas auth).
+**Fase 3 (US1) concluída** — checkpoint "MVP funcional" atingido (T061-T114).
+O fluxo completo conta→cenário→upload→parametrização→cálculo→resultado está
+implementado e testado end-to-end com fakes in-memory.
+Próximas tarefas: Phase 4 (US2) — equipe, papéis e aprovação (T116-T127).
+
+Componentes implementados nesta fase:
+- `apps/api/src/routes/v1/`: auth, upload, ingestion, forecast, scenarios
+- `apps/api/src/services/`: ForecastService, IngestionService
+- `apps/api/src/adapters/rabbitmq/forecast-result.consumer.ts`
+- `apps/ingestion-worker/src/application/`: csv-stream-parser, validation-report, persist-history
+- `apps/ingestion-worker/src/messaging/ingestion.consumer.ts`
+- `apps/web/src/app/(auth)/`: sign-in, sign-up
+- `apps/web/src/app/scenarios/page.tsx`
+- Contratos bilaterais em `packages/contracts/src/messaging/` e `src/http/`
+
+Portas pendentes de adaptadores concretos (Prisma): ForecastRepository,
+ForecastItemRepository, DatasetExporter, ParquetReader.
 
 **Nota Windows**: spawnSync com process.execPath falha via Bash tool (symlink nvm4w).
 Usar `'node'` como comando (PATH) + `shell: false` em testes de integração que precisam
