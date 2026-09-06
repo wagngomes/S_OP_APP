@@ -98,6 +98,17 @@ export class InMemoryScenarios implements ScenarioRepository {
     return Math.max(1, 10 ** levelIds.length);
   }
 
+  async transitionPhase(
+    scenarioId: string,
+    from: ScenarioRecord['phase'],
+    to: ScenarioRecord['phase'],
+  ): Promise<void> {
+    const s = this.scenarios.get(scenarioId);
+    if (s && s.phase === from) {
+      this.scenarios.set(scenarioId, { ...s, phase: to });
+    }
+  }
+
   // --- utilidades de teste ---------------------------------------------------
 
   setPhase(scenarioId: string, phase: ScenarioRecord['phase']): void {

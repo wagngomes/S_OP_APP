@@ -1,0 +1,251 @@
+{
+  "$comment": "Vetores dourados de forecast.request, forecast.result e ingestion.request. Lidos por Vitest e por pytest. Ver specs/001-sop-cycle-forecasting/contracts/messaging.md",
+  "version": 1,
+
+  "forecastRequest": {
+    "accept": [
+      {
+        "name": "request-standard-completo",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000",
+          "scenarioId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001",
+          "inputUri": "s3://sop/datasets/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000/input.parquet",
+          "outputPrefix": "s3://sop/datasets/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000/",
+          "modelCatalogVersion": "2026.08",
+          "params": {
+            "groupingLabels": ["BU", "Setor"],
+            "granularLabels": ["BU", "Setor", "CD"],
+            "prorationMonths": 12,
+            "horizonMonths": 12,
+            "accuracyMetric": "WMAPE",
+            "modelPackage": "STANDARD",
+            "decimalScale": 6,
+            "nonNegativeForecast": true
+          }
+        }
+      },
+      {
+        "name": "request-fast-horizonte-curto",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5010",
+          "scenarioId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5011",
+          "inputUri": "s3://sop/datasets/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5011/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5010/input.parquet",
+          "outputPrefix": "s3://sop/datasets/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5011/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5010/",
+          "modelCatalogVersion": "2026.08",
+          "params": {
+            "groupingLabels": ["BU"],
+            "granularLabels": ["BU", "CD"],
+            "prorationMonths": 6,
+            "horizonMonths": 3,
+            "accuracyMetric": "MAPE",
+            "modelPackage": "FAST",
+            "decimalScale": 3,
+            "nonNegativeForecast": true
+          }
+        }
+      }
+    ],
+    "reject": [
+      {
+        "name": "sem-jobId",
+        "$comment": "jobId é obrigatório — é a chave de idempotência (D6).",
+        "payload": {
+          "scenarioId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001",
+          "inputUri": "s3://sop/datasets/a/b/input.parquet",
+          "outputPrefix": "s3://sop/datasets/a/b/",
+          "modelCatalogVersion": "2026.08",
+          "params": {
+            "groupingLabels": ["BU"],
+            "granularLabels": ["BU", "CD"],
+            "prorationMonths": 12,
+            "horizonMonths": 12,
+            "accuracyMetric": "WMAPE",
+            "modelPackage": "STANDARD",
+            "decimalScale": 6,
+            "nonNegativeForecast": true
+          }
+        }
+      },
+      {
+        "name": "inputUri-nao-s3",
+        "$comment": "inputUri deve ser um URI s3:// — nunca URL HTTP (D5).",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000",
+          "scenarioId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001",
+          "inputUri": "https://minio.local/sop/datasets/a/b/input.parquet",
+          "outputPrefix": "s3://sop/datasets/a/b/",
+          "modelCatalogVersion": "2026.08",
+          "params": {
+            "groupingLabels": ["BU"],
+            "granularLabels": ["BU", "CD"],
+            "prorationMonths": 12,
+            "horizonMonths": 12,
+            "accuracyMetric": "WMAPE",
+            "modelPackage": "STANDARD",
+            "decimalScale": 6,
+            "nonNegativeForecast": true
+          }
+        }
+      },
+      {
+        "name": "horizonMonths-zero",
+        "$comment": "Horizonte de previsão deve ser pelo menos 1.",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000",
+          "scenarioId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001",
+          "inputUri": "s3://sop/datasets/a/b/input.parquet",
+          "outputPrefix": "s3://sop/datasets/a/b/",
+          "modelCatalogVersion": "2026.08",
+          "params": {
+            "groupingLabels": ["BU"],
+            "granularLabels": ["BU", "CD"],
+            "prorationMonths": 12,
+            "horizonMonths": 0,
+            "accuracyMetric": "WMAPE",
+            "modelPackage": "STANDARD",
+            "decimalScale": 6,
+            "nonNegativeForecast": true
+          }
+        }
+      },
+      {
+        "name": "groupingLabels-vazio",
+        "$comment": "Precisa de pelo menos um nível de agrupamento.",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000",
+          "scenarioId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001",
+          "inputUri": "s3://sop/datasets/a/b/input.parquet",
+          "outputPrefix": "s3://sop/datasets/a/b/",
+          "modelCatalogVersion": "2026.08",
+          "params": {
+            "groupingLabels": [],
+            "granularLabels": ["BU", "CD"],
+            "prorationMonths": 12,
+            "horizonMonths": 12,
+            "accuracyMetric": "WMAPE",
+            "modelPackage": "STANDARD",
+            "decimalScale": 6,
+            "nonNegativeForecast": true
+          }
+        }
+      },
+      {
+        "name": "pacote-invalido",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000",
+          "scenarioId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001",
+          "inputUri": "s3://sop/datasets/a/b/input.parquet",
+          "outputPrefix": "s3://sop/datasets/a/b/",
+          "modelCatalogVersion": "2026.08",
+          "params": {
+            "groupingLabels": ["BU"],
+            "granularLabels": ["BU", "CD"],
+            "prorationMonths": 12,
+            "horizonMonths": 12,
+            "accuracyMetric": "WMAPE",
+            "modelPackage": "TURBO",
+            "decimalScale": 6,
+            "nonNegativeForecast": true
+          }
+        }
+      }
+    ]
+  },
+
+  "forecastResult": {
+    "accept": [
+      {
+        "name": "result-concluido",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000",
+          "status": "completed",
+          "outputUri": "s3://sop/datasets/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000/output.parquet",
+          "seriesUri": "s3://sop/datasets/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000/series.parquet",
+          "modelCatalogVersion": "2026.08",
+          "stats": { "seriesCount": 1420, "itemCount": 88123, "durationMs": 412000 },
+          "failure": null
+        }
+      },
+      {
+        "name": "result-falhou",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000",
+          "status": "failed",
+          "outputUri": null,
+          "seriesUri": null,
+          "modelCatalogVersion": "2026.08",
+          "stats": null,
+          "failure": { "code": "MODEL_FAILURE", "message": "All models failed for all series" }
+        }
+      }
+    ],
+    "reject": [
+      {
+        "name": "status-invalido",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000",
+          "status": "running",
+          "outputUri": null,
+          "seriesUri": null,
+          "modelCatalogVersion": "2026.08",
+          "stats": null,
+          "failure": null
+        }
+      },
+      {
+        "name": "concluido-sem-outputUri",
+        "$comment": "status=completed exige outputUri e seriesUri não-nulos.",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5000",
+          "status": "completed",
+          "outputUri": null,
+          "seriesUri": "s3://sop/datasets/a/b/series.parquet",
+          "modelCatalogVersion": "2026.08",
+          "stats": { "seriesCount": 1, "itemCount": 1, "durationMs": 1 },
+          "failure": null
+        }
+      }
+    ]
+  },
+
+  "ingestionRequest": {
+    "accept": [
+      {
+        "name": "ingestion-sales-history",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5002",
+          "scenarioId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001",
+          "kind": "SALES_HISTORY",
+          "objectUri": "s3://sop/uploads/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001/018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5002/original.csv",
+          "declaredLabels": ["BU", "Setor", "CD"],
+          "uploadedById": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5003"
+        }
+      }
+    ],
+    "reject": [
+      {
+        "name": "kind-invalido",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5002",
+          "scenarioId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001",
+          "kind": "PURCHASE_ORDER",
+          "objectUri": "s3://sop/uploads/a/b/original.csv",
+          "declaredLabels": ["BU"],
+          "uploadedById": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5003"
+        }
+      },
+      {
+        "name": "declaredLabels-vazio",
+        "$comment": "Precisa de ao menos um rótulo declarado para validar o CSV.",
+        "payload": {
+          "jobId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5002",
+          "scenarioId": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5001",
+          "kind": "SALES_HISTORY",
+          "objectUri": "s3://sop/uploads/a/b/original.csv",
+          "declaredLabels": [],
+          "uploadedById": "018f3a2b-4c5d-7e8f-9a0b-1c2d3e4f5003"
+        }
+      }
+    ]
+  }
+}

@@ -141,7 +141,7 @@ previsão consistente, sem nenhuma das outras histórias.
 
 ### Tests for User Story 1
 
-- [ ] T061 [P] [US1] Teste de contrato das rotas de autenticação em apps/api/tests/contract/auth.contract.test.ts
+- [X] T061 [P] [US1] Teste de contrato das rotas de autenticação em apps/api/tests/contract/auth.contract.test.ts
 - [X] T062 [P] [US1] Teste unitário da validação de contagem de segmentos contra os rótulos declarados em packages/domain/tests/ingestion/segment-validation.test.ts (FR-023, FR-024)
 - [X] T063 [P] [US1] Teste unitário do preenchimento de lacunas internas e do corte do prefixo anterior à primeira venda em services/forecast-engine/tests/unit/test_gap_filling.py (FR-040d, D15)
 - [X] T064 [P] [US1] Teste unitário da agregação do histórico por combinação de níveis em services/forecast-engine/tests/unit/test_aggregation.py
@@ -149,11 +149,11 @@ previsão consistente, sem nenhuma das outras histórias.
 - [X] T066 [P] [US1] Teste de propriedade provando `soma(filhos) == pai` em rateios aleatórios em services/forecast-engine/tests/unit/test_proration_conservation.py (FR-046)
 - [X] T067 [P] [US1] Teste unitário de cada métrica do catálogo, incluindo denominador zero, em services/forecast-engine/tests/unit/test_metrics.py (FR-036, FR-086)
 - [X] T068 [P] [US1] Teste unitário da seleção do modelo vencedor por métrica e da exclusão de candidatos por histórico insuficiente em services/forecast-engine/tests/unit/test_model_selection.py (FR-042, FR-043b, D14)
-- [ ] T069 [P] [US1] Teste de contrato de `forecast.request` e `forecast.result` nos dois lados em packages/contracts/tests/forecast.contract.test.ts e services/forecast-engine/tests/contract/test_forecast_messages.py
-- [ ] T070 [P] [US1] Teste de integração do upload respondendo 202 sem parsear conteúdo em apps/api/tests/integration/upload-202.test.ts (D7)
-- [ ] T071 [P] [US1] Teste de integração do worker de ingestão acumulando o relatório de linhas inválidas em vez de abortar na primeira, em apps/ingestion-worker/tests/integration/issue-report.test.ts (FR-024)
-- [ ] T072 [P] [US1] Teste de integração do fluxo completo conta → cenário → upload → parametrização → cálculo → resultado em apps/api/tests/integration/us1-end-to-end.test.ts
-- [ ] T073 [P] [US1] Teste de caminho de falha: cálculo disparado sem métrica, com nível repetido, com combinação vazia e com job já ativo, em apps/api/tests/integration/us1-failures.test.ts (FR-032b, FR-032c, FR-035, FR-051)
+- [X] T069 [P] [US1] Teste de contrato de `forecast.request` e `forecast.result` nos dois lados em packages/contracts/tests/forecast.contract.test.ts e services/forecast-engine/tests/contract/test_forecast_messages.py
+- [X] T070 [P] [US1] Teste de integração do upload respondendo 202 sem parsear conteúdo em apps/api/tests/integration/upload-202.test.ts (D7)
+- [X] T071 [P] [US1] Teste de integração do worker de ingestão acumulando o relatório de linhas inválidas em vez de abortar na primeira, em apps/ingestion-worker/tests/integration/issue-report.test.ts (FR-024)
+- [X] T072 [P] [US1] Teste de integração do fluxo completo conta → cenário → upload → parametrização → cálculo → resultado em apps/api/tests/integration/us1-end-to-end.test.ts
+- [X] T073 [P] [US1] Teste de caminho de falha: cálculo disparado sem métrica, com nível repetido, com combinação vazia e com job já ativo, em apps/api/tests/integration/us1-failures.test.ts (FR-032b, FR-032c, FR-035, FR-051)
 
 ### Domínio compartilhado (TypeScript)
 
@@ -178,35 +178,35 @@ previsão consistente, sem nenhuma das outras histórias.
 - [X] T089 [US1] Implementar a orquestração do job (ler, preparar, calcular, ratear, quantizar, gravar) em services/forecast-engine/src/forecast_engine/application/forecast_job.py
 - [X] T090 [US1] Implementar a escrita de output.parquet, series.parquet e do marcador `_SUCCESS` em services/forecast-engine/src/forecast_engine/application/result_writer.py (D18)
 - [X] T091 [US1] Implementar o consumidor de `sop.forecast.request.v1` e o publicador de `sop.forecast.result.v1` em services/forecast-engine/src/forecast_engine/messaging/forecast_consumer.py
-- [ ] T092 [US1] Implementar o processamento em lotes para respeitar o limite de memória em services/forecast-engine/src/forecast_engine/application/batching.py
-- [ ] T093 [US1] Implementar a republicação do resultado quando o `_SUCCESS` já existe, em vez de recalcular, em services/forecast-engine/src/forecast_engine/messaging/forecast_consumer.py (D6)
+- [X] T092 [US1] Implementar o processamento em lotes para respeitar o limite de memória em services/forecast-engine/src/forecast_engine/application/batching.py
+- [X] T093 [US1] Implementar a republicação do resultado quando o `_SUCCESS` já existe, em vez de recalcular, em services/forecast-engine/src/forecast_engine/messaging/forecast_consumer.py (D6)
 
 ### API de orquestração
 
-- [ ] T094 [P] [US1] Implementar as rotas de cadastro, login, logout, recuperação e sessão em apps/api/src/routes/v1/auth.routes.ts (FR-001 a FR-004)
+- [X] T094 [P] [US1] Implementar as rotas de cadastro, login, logout, recuperação e sessão em apps/api/src/routes/v1/auth.routes.ts (FR-001 a FR-004)
 - [X] T095 [P] [US1] Implementar controller e service de criação e leitura de cenário em apps/api/src/controllers/scenario.controller.ts e apps/api/src/services/scenario.service.ts (FR-006, FR-007)
-- [ ] T096 [US1] Implementar a rota de upload multipart em streaming direto para o MinIO, validando apenas o envelope e respondendo 202, em apps/api/src/routes/v1/upload.routes.ts (D7)
-- [ ] T097 [US1] Implementar a criação do IngestionJob e a publicação em `sop.ingestion.request.v1` em apps/api/src/services/ingestion.service.ts
-- [ ] T098 [US1] Implementar as rotas de status e de relatório paginado de issues em apps/api/src/routes/v1/ingestion.routes.ts (FR-024, FR-027)
+- [X] T096 [US1] Implementar a rota de upload multipart em streaming direto para o MinIO, validando apenas o envelope e respondendo 202, em apps/api/src/routes/v1/upload.routes.ts (D7)
+- [X] T097 [US1] Implementar a criação do IngestionJob e a publicação em `sop.ingestion.request.v1` em apps/api/src/services/ingestion.service.ts
+- [X] T098 [US1] Implementar as rotas de status e de relatório paginado de issues em apps/api/src/routes/v1/ingestion.routes.ts (FR-024, FR-027)
 - [X] T099 [P] [US1] Implementar a rota de níveis declarados em apps/api/src/routes/v1/levels.routes.ts (FR-031)
 - [X] T100 [US1] Implementar a rota de parametrização com todas as validações e o aviso `zeroHeavyWarning` em apps/api/src/routes/v1/parameters.routes.ts (FR-032 a FR-036a)
 - [X] T101 [US1] Implementar a rota `series-preview` com `COUNT(DISTINCT)` e estimativa de tempo em apps/api/src/routes/v1/series-preview.routes.ts (FR-034a, FR-034d, D1a)
 - [X] T102 [P] [US1] Implementar a rota de catálogo de pacotes de modelos em apps/api/src/routes/v1/model-packages.routes.ts (FR-034c)
-- [ ] T103 [US1] Implementar o disparo do cálculo com exportação do dataset para o MinIO e publicação da referência, recusando com 409 quando já houver job ativo, em apps/api/src/services/forecast.service.ts (FR-051)
-- [ ] T104 [US1] Implementar o consumidor de `sop.forecast.result.v1` que persiste ForecastItem e ForecastSeriesResult e avança a fase, em apps/api/src/adapters/rabbitmq/forecast-result.consumer.ts
-- [ ] T105 [US1] Implementar as rotas de leitura de forecast-items e forecast-series, recusando com 409 enquanto o job não concluir, em apps/api/src/routes/v1/forecast.routes.ts (FR-048, FR-052)
+- [X] T103 [US1] Implementar o disparo do cálculo com exportação do dataset para o MinIO e publicação da referência, recusando com 409 quando já houver job ativo, em apps/api/src/services/forecast.service.ts (FR-051)
+- [X] T104 [US1] Implementar o consumidor de `sop.forecast.result.v1` que persiste ForecastItem e ForecastSeriesResult e avança a fase, em apps/api/src/adapters/rabbitmq/forecast-result.consumer.ts
+- [X] T105 [US1] Implementar as rotas de leitura de forecast-items e forecast-series, recusando com 409 enquanto o job não concluir, em apps/api/src/routes/v1/forecast.routes.ts (FR-048, FR-052)
 
 ### Worker de ingestão
 
-- [ ] T106 [US1] Implementar o consumidor de `sop.ingestion.request.v1` em apps/ingestion-worker/src/messaging/ingestion.consumer.ts
-- [ ] T107 [US1] Implementar a leitura em streaming do MinIO e o parse incremental do CSV em apps/ingestion-worker/src/application/csv-stream-parser.ts
-- [ ] T108 [US1] Implementar a validação linha a linha com acumulação do relatório e teto de issues em apps/ingestion-worker/src/application/validation-report.ts (FR-024, D7)
-- [ ] T109 [US1] Implementar a persistência de SalesRecord e IngestionIssue via Prisma, com transição idempotente de status, em apps/ingestion-worker/src/application/persist-history.ts
+- [X] T106 [US1] Implementar o consumidor de `sop.ingestion.request.v1` em apps/ingestion-worker/src/messaging/ingestion.consumer.ts
+- [X] T107 [US1] Implementar a leitura em streaming do MinIO e o parse incremental do CSV em apps/ingestion-worker/src/application/csv-stream-parser.ts
+- [X] T108 [US1] Implementar a validação linha a linha com acumulação do relatório e teto de issues em apps/ingestion-worker/src/application/validation-report.ts (FR-024, D7)
+- [X] T109 [US1] Implementar a persistência de SalesRecord e IngestionIssue via Prisma, com transição idempotente de status, em apps/ingestion-worker/src/application/persist-history.ts
 
 ### Frontend
 
-- [ ] T110 [P] [US1] Implementar as telas de cadastro e login em apps/web/src/app/(auth)/
-- [ ] T111 [P] [US1] Implementar a tela de criação e listagem de cenários em apps/web/src/app/scenarios/
+- [X] T110 [P] [US1] Implementar as telas de cadastro e login em apps/web/src/app/(auth)/
+- [X] T111 [P] [US1] Implementar a tela de criação e listagem de cenários em apps/web/src/app/scenarios/
 - [ ] T112 [US1] Implementar a tela de upload com acompanhamento por polling e exibição do relatório de linhas inválidas em apps/web/src/app/scenarios/[id]/upload/
 - [ ] T113 [US1] Implementar o campo de arrastar níveis, o seletor de pacote e a exibição de `seriesCount` e tempo estimado em apps/web/src/app/scenarios/[id]/parameters/ (FR-032, FR-034a)
 - [ ] T114 [US1] Implementar a tela de resultado com previsão por item, modelo vencedor e erro, formatando strings decimais sem recalcular nada em apps/web/src/app/scenarios/[id]/forecast/ (Princípio II)

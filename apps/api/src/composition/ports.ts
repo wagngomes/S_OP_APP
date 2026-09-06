@@ -18,6 +18,31 @@ export type HealthChecks = {
   checkObjectStore(): Promise<boolean>;
 };
 
+/** Resultado de autenticação devolvido pelas rotas de auth. */
+export type AuthedUser = { id: string; email: string; name: string };
+
+/**
+ * Porta de autenticação (FR-001 a FR-004).
+ *
+ * As rotas de auth dependem desta abstração; o adaptador concreto é BetterAuth.
+ * A separação permite exercitar as rotas com um fake sem banco (Princípio IV).
+ */
+export type AuthPort = {
+  signUp(
+    body: { name: string; email: string; password: string },
+    requestHeaders: Headers,
+  ): Promise<{ user: AuthedUser; setCookies: string[] }>;
+
+  signIn(
+    body: { email: string; password: string },
+    requestHeaders: Headers,
+  ): Promise<{ user: AuthedUser; setCookies: string[] }>;
+
+  signOut(requestHeaders: Headers): Promise<{ setCookies: string[] }>;
+
+  getSession(requestHeaders: Headers): Promise<{ user: AuthedUser | null }>;
+};
+
 /** Publica a referência de um job numa fila (D5: referência, nunca dataset). */
 export type JobPublisher = {
   publish(queue: string, payload: unknown, correlationId: string): Promise<void>;
@@ -104,15 +129,171 @@ export type ScenarioRepository = {
 
   /** FR-034a — `COUNT(DISTINCT)` sobre o histórico já persistido (D1a). */
   countDistinctSeries(scenarioId: string, levelIds: string[]): Promise<number>;
+
+  /** Avança a fase do cenário quando a condição for satisfeita. */
+  transitionPhase(
+    scenarioId: string,
+    from: ScenarioRecord['phase'],
+    to: ScenarioRecord['phase'],
+  ): Promise<void>;
+};
+
+// --- Ingestão -----------------------------------------------------------------
+
+export type IngestionJobRecord = {
+  id: string;
+  scenarioId: string;
+  kind: 'SALES_HISTORY' | 'COLLABORATION_SHEET' | 'ACTUAL_SALES';
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  objectUri: string;
+  declaredLabels: string[];
+  totalRows: number;
+  validRows: number;
+  invalidRows: number;
+  issueCount: number;
+  issueCapReached: boolean;
+  correlationId: string;
+  createdAt: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  failureReason: string | null;
+};
+
+export type IngestionIssueRecord = {
+  id: string;
+  jobId: string;
+  lineNumber: number;
+  column: string | null;
+  code: string;
+  detail: string;
+};
+
+export type IngestionRepository = {
+  create(input: {
+    scenarioId: string;
+    kind: string;
+    objectUri: string;
+    declaredLabels: string[];
+    uploadedById: string;
+    correlationId: string;
+  }): Promise<IngestionJobRecord>;
+
+  findById(id: string): Promise<IngestionJobRecord | null>;
+
+  listIssues(
+    jobId: string,
+    page: { limit: number; offset: number },
+  ): Promise<{ data: IngestionIssueRecord[]; total: number }>;
+};
+
+// --- Forecast -----------------------------------------------------------------
+
+export type ForecastJobRecord = {
+  id: string;
+  scenarioId: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  /** URI do dataset Parquet exportado antes do cálculo (D5). */
+  objectUri: string;
+  /** URI do output.parquet escrito pelo motor (null até completar). */
+  resultOutputUri: string | null;
+  /** URI do series.parquet escrito pelo motor (null até completar). */
+  resultSeriesUri: string | null;
+  horizonMonths: number;
+  accuracyMetric: string;
+  modelPackage: string;
+  createdAt: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  failureReason: string | null;
+};
+
+export type ForecastRepository = {
+  create(input: {
+    scenarioId: string;
+    objectUri: string;
+    horizonMonths: number;
+    accuracyMetric: string;
+    modelPackage: string;
+    correlationId: string;
+  }): Promise<ForecastJobRecord>;
+
+  /** FR-051 — retorna o job ativo (PENDING ou PROCESSING) se existir. */
+  findActiveByScenario(scenarioId: string): Promise<ForecastJobRecord | null>;
+
+  findById(id: string): Promise<ForecastJobRecord | null>;
+
+  updateResult(
+    id: string,
+    result: {
+      status: 'COMPLETED' | 'FAILED';
+      resultOutputUri?: string;
+      resultSeriesUri?: string;
+      failureReason?: string;
+    },
+  ): Promise<void>;
+};
+
+/** Exporta o histórico do cenário como Parquet para o MinIO (D5). */
+export type DatasetExporter = {
+  exportHistory(scenarioId: string, outputUri: string): Promise<void>;
+};
+
+// --- ForecastItem / ForecastSeriesResult -------------------------------------
+
+export type ForecastItemInput = {
+  productCode: string;
+  segments: string[];
+  seriesKey: string;
+  year: number;
+  month: number;
+  /** String decimal (Princípio V). */
+  calculatedQuantity: string;
+};
+
+export type ForecastSeriesInput = {
+  seriesKey: string;
+  winningModel: string;
+  metricValue: string | null;
+  evaluatedModels: string[];
+  excludedModels: string[];
+  backtestWindowsUsed: number;
+  fallbackApplied: boolean;
+};
+
+export type ForecastItemRepository = {
+  bulkCreateItems(jobId: string, scenarioId: string, items: ForecastItemInput[]): Promise<void>;
+  bulkCreateSeries(jobId: string, series: ForecastSeriesInput[]): Promise<void>;
+  listItems(
+    jobId: string,
+    page: { limit: number; offset: number },
+  ): Promise<{ data: ForecastItemInput[]; total: number }>;
+  listSeries(
+    jobId: string,
+    page: { limit: number; offset: number },
+  ): Promise<{ data: ForecastSeriesInput[]; total: number }>;
+};
+
+/** Lê Parquet do MinIO e devolve os registros já tipados. */
+export type ParquetReader = {
+  readItems(uri: string): Promise<ForecastItemInput[]>;
+  readSeries(uri: string): Promise<ForecastSeriesInput[]>;
 };
 
 /** Dependências que o `buildApp` recebe. */
 export type AppDependencies = {
   health: HealthChecks;
+  /** Identifica o usuário da sessão — usada pelas rotas de negócio. */
   auth?: Authenticator;
+  /** Implementa sign-up, sign-in, sign-out e get-session. */
+  authPort?: AuthPort;
+  ingestion?: IngestionRepository;
+  forecast?: ForecastRepository;
+  forecastItems?: ForecastItemRepository;
   scenarios?: ScenarioRepository;
   publisher?: JobPublisher;
   datasets?: DatasetStore;
+  datasetExporter?: DatasetExporter;
+  parquet?: ParquetReader;
   /** Sobrescreve o logger — usado nos testes para capturar o que foi emitido. */
   logger?: FastifyServerOptions['logger'];
 };

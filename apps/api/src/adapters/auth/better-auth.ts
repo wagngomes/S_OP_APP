@@ -1,9 +1,8 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { fromNodeHeaders, toNodeHandler } from 'better-auth/node';
+import { fromNodeHeaders } from 'better-auth/node';
 import type { PrismaClient } from '@prisma/client';
-import type { IncomingMessage, ServerResponse } from 'node:http';
-import type { Authenticator } from '../../composition/ports.js';
+import type { AuthPort, AuthedUser, Authenticator } from '../../composition/ports.js';
 
 /**
  * Instância BetterAuth com adaptador Prisma e provedor e-mail/senha (D8).
@@ -44,15 +43,63 @@ export function createAuthenticator(auth: BetterAuthInstance): Authenticator {
   };
 }
 
+function collectSetCookies(headers: Headers): string[] {
+  const raw = headers.getSetCookie?.() ?? [];
+  if (raw.length > 0) return raw;
+  const single = headers.get('set-cookie');
+  return single ? [single] : [];
+}
+
+function toUser(u: { id: string; email: string; name: string }): AuthedUser {
+  return { id: u.id, email: u.email, name: u.name ?? '' };
+}
+
 /**
- * Handler Node.js para montar o BetterAuth no Fastify via `addContentTypeParser`.
+ * Implementa a porta `AuthPort` sobre a instância BetterAuth.
  *
- * Uso no app.ts:
- *   app.addContentTypeParser('application/json', {}, (_, payload, done) => done(null, payload));
- *   app.all('/api/auth/*', (req, res) => authHandler(req.raw, res.raw));
+ * Usa a API programática (auth.api.*) para evitar dependência de parsing de
+ * corpo HTTP — cada rota Fastify valida o body por Zod e chama este port.
  */
-export function createAuthHandler(
-  auth: BetterAuthInstance,
-): (req: IncomingMessage, res: ServerResponse) => Promise<void> {
-  return toNodeHandler(auth);
+export function createAuthPort(auth: BetterAuthInstance): AuthPort {
+  return {
+    async signUp({ name, email, password }, requestHeaders) {
+      const res = await auth.api.signUpEmail({
+        body: { name, email, password },
+        headers: requestHeaders,
+        asResponse: true,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({})) as Record<string, unknown>;
+        const msg = typeof err['message'] === 'string' ? err['message'] : 'sign-up falhou';
+        const code: number = typeof err['status'] === 'number' ? err['status'] : res.status;
+        throw Object.assign(new Error(msg), { statusCode: code });
+      }
+      const data = await res.json() as { user: { id: string; email: string; name: string } };
+      return { user: toUser(data.user), setCookies: collectSetCookies(res.headers) };
+    },
+
+    async signIn({ email, password }, requestHeaders) {
+      const res = await auth.api.signInEmail({
+        body: { email, password },
+        headers: requestHeaders,
+        asResponse: true,
+      });
+      if (!res.ok) {
+        throw Object.assign(new Error('credenciais inválidas'), { statusCode: 401 });
+      }
+      const data = await res.json() as { user: { id: string; email: string; name: string } };
+      return { user: toUser(data.user), setCookies: collectSetCookies(res.headers) };
+    },
+
+    async signOut(requestHeaders) {
+      const res = await auth.api.signOut({ headers: requestHeaders, asResponse: true });
+      return { setCookies: collectSetCookies(res.headers) };
+    },
+
+    async getSession(requestHeaders) {
+      const session = await auth.api.getSession({ headers: requestHeaders });
+      if (!session?.user) return { user: null };
+      return { user: toUser(session.user) };
+    },
+  };
 }

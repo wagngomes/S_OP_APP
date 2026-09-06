@@ -113,6 +113,7 @@ class ForecastConsumer:
         input_uri = str(payload.get("inputUri", ""))
         output_prefix = str(payload.get("outputPrefix", ""))
         params_raw = payload.get("params", {})
+        catalog_version = str(payload.get("modelCatalogVersion", ""))
         correlation_id = str(envelope.get("correlationId", ""))
 
         _logger.info(
@@ -120,43 +121,82 @@ class ForecastConsumer:
             extra={"jobId": job_id, "scenarioId": scenario_id, "correlationId": correlation_id},
         )
 
+        sep = "" if output_prefix.endswith("/") else "/"
+        output_uri = f"{output_prefix}{sep}output.parquet"
+        series_uri = f"{output_prefix}{sep}series.parquet"
+
         # D6 — idempotência: se _SUCCESS existe, republica sem recalcular (T093)
         if self._store.is_complete(output_prefix):
-            _logger.info("resultado já existe — republicando sem recalcular (D6)", extra={"jobId": job_id})
-            self._publish_result(job_id, scenario_id, output_prefix, correlation_id)
+            _logger.info(
+                "resultado já existe — republicando sem recalcular (D6)",
+                extra={"jobId": job_id},
+            )
+            self._publish_result(
+                job_id=job_id,
+                output_uri=output_uri,
+                series_uri=series_uri,
+                catalog_version=catalog_version,
+                correlation_id=correlation_id,
+                series_count=0,
+                item_count=0,
+                duration_ms=0,
+            )
             return
 
-        # Lê dataset, executa cálculo, grava resultado
-        from forecast_engine.application.dataset_reader import DatasetReader
-        from forecast_engine.application.forecast_job import ForecastParams, run_forecast
+        from forecast_engine.application.batching import run_forecast_in_batches
+        from forecast_engine.application.forecast_job import ForecastParams
         from forecast_engine.domain.model_catalog import ModelPackage
         from forecast_engine.adapters.observability import jobs_total, job_duration_seconds, rows_processed_total
 
         rows = self._reader.read(input_uri)
+
+        # O motor recebe rótulos posicionais; a API envia groupingLabels e
+        # granularLabels — as posições são derivadas da ordem dos rótulos granulares.
+        granular = list(params_raw.get("granularLabels", []))
+        grouping = list(params_raw.get("groupingLabels", []))
+        grouping_positions = [granular.index(lbl) for lbl in grouping if lbl in granular]
+
         params = ForecastParams(
-            grouping_positions=list(params_raw.get("groupingPositions", [])),
-            proration_months=int(params_raw.get("prorationMonths", 3)),
-            horizon_months=int(params_raw.get("horizonMonths", 3)),
-            metric=str(params_raw.get("metric", "WMAPE")),
-            package=ModelPackage(str(params_raw.get("package", "FAST"))),
+            grouping_positions=grouping_positions,
+            proration_months=int(params_raw.get("prorationMonths", 12)),
+            horizon_months=int(params_raw.get("horizonMonths", 12)),
+            metric=str(params_raw.get("accuracyMetric", "WMAPE")),
+            package=ModelPackage(str(params_raw.get("modelPackage", "FAST"))),
+            scale=int(params_raw.get("decimalScale", 6)),
         )
 
+        import time
+        t0 = time.monotonic()
         with job_duration_seconds.time():
-            outcome = run_forecast(rows, params)
+            outcome = run_forecast_in_batches(rows, params)
+        duration_ms = int((time.monotonic() - t0) * 1000)
 
         rows_processed_total.inc(len(outcome.items))
         self._writer.write(output_prefix, outcome)
         self._store.write_success_marker(output_prefix)
         jobs_total.labels(outcome="success").inc()
 
-        self._publish_result(job_id, scenario_id, output_prefix, correlation_id)
+        self._publish_result(
+            job_id=job_id,
+            output_uri=output_uri,
+            series_uri=series_uri,
+            catalog_version=catalog_version,
+            correlation_id=correlation_id,
+            series_count=outcome.series_count,
+            item_count=len(outcome.items),
+            duration_ms=duration_ms,
+        )
 
     def _publish_result(
         self,
         job_id: str,
-        scenario_id: str,
-        output_prefix: str,
+        output_uri: str,
+        series_uri: str,
+        catalog_version: str,
         correlation_id: str,
+        series_count: int,
+        item_count: int,
+        duration_ms: int,
     ) -> None:
         import pika
 
@@ -168,9 +208,16 @@ class ForecastConsumer:
             "type": "forecast.result",
             "payload": {
                 "jobId": job_id,
-                "scenarioId": scenario_id,
-                "outputPrefix": output_prefix,
-                "status": "COMPLETED",
+                "status": "completed",
+                "outputUri": output_uri,
+                "seriesUri": series_uri,
+                "modelCatalogVersion": catalog_version,
+                "stats": {
+                    "seriesCount": series_count,
+                    "itemCount": item_count,
+                    "durationMs": duration_ms,
+                },
+                "failure": None,
             },
         }
         self._channel.basic_publish(

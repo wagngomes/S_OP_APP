@@ -16,7 +16,11 @@ import { correlationIdFrom, registerCorrelation } from './observability/correlat
 import { loggerOptions } from './observability/logger.js';
 import { createMetrics, registerMetrics } from './observability/metrics.js';
 import { registerHealthRoutes } from './routes/health.js';
+import { registerAuthRoutes } from './routes/v1/auth.routes.js';
+import { registerForecastRoutes } from './routes/v1/forecast.routes.js';
+import { registerIngestionRoutes } from './routes/v1/ingestion.routes.js';
 import { registerScenarioRoutes } from './routes/v1/scenarios.routes.js';
+import { registerUploadRoutes } from './routes/v1/upload.routes.js';
 
 /**
  * Montagem da aplicação.
@@ -42,6 +46,10 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
 
   registerCorrelation(app);
   registerErrorHandler(app);
+
+  await app.register(import('@fastify/multipart'), {
+    limits: { fileSize: 500 * 1024 * 1024 },
+  });
 
   const metrics = createMetrics();
   registerMetrics(app, metrics);
@@ -72,8 +80,32 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
   await app.register(
     async (instance) => {
       await registerV1Routes(instance);
+      if (deps.authPort) {
+        await instance.register(
+          async (authInstance) => registerAuthRoutes(authInstance, deps.authPort!),
+          { prefix: '/auth' },
+        );
+      }
       if (deps.auth && deps.scenarios) {
         registerScenarioRoutes(instance, { auth: deps.auth, scenarios: deps.scenarios });
+      }
+      if (deps.auth && deps.ingestion && deps.publisher && deps.datasets) {
+        registerUploadRoutes(instance, {
+          auth: deps.auth,
+          ingestion: deps.ingestion,
+          publisher: deps.publisher,
+          datasets: deps.datasets,
+        });
+        registerIngestionRoutes(instance, { auth: deps.auth, ingestion: deps.ingestion });
+      }
+      if (deps.auth && deps.forecast && deps.scenarios && deps.publisher && deps.datasetExporter) {
+        registerForecastRoutes(instance, {
+          auth: deps.auth,
+          forecast: deps.forecast,
+          scenarios: deps.scenarios,
+          publisher: deps.publisher,
+          exporter: deps.datasetExporter,
+        });
       }
     },
     { prefix: '/api/v1' },
