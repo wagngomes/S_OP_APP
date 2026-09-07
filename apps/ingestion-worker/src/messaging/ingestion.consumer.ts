@@ -1,31 +1,38 @@
 import { IngestionRequestPayload } from '@sop/contracts';
 import { parseCsvStream } from '../application/csv-stream-parser.js';
+import { persistCollaborationSheet } from '../application/persist-collaboration-sheet.js';
 import { persistHistory } from '../application/persist-history.js';
 import { buildValidationReport } from '../application/validation-report.js';
 import type { IngestionWorkerPorts } from '../composition/ports.js';
 
 /**
- * Consumidor de `sop.ingestion.request.v1` (T106).
+ * Consumidor de `sop.ingestion.request.v1` (T106, T138).
  *
- * Fluxo:
- *  1. Marca o job como PROCESSING.
- *  2. Lê o CSV em streaming do MinIO.
- *  3. Faz o parse linha a linha (T107) — não aborta na primeira linha ruim.
- *  4. Constrói o relatório de issues (T108, FR-024).
- *  5. Persiste os registros válidos e as issues (T109).
- *  6. Marca o job como COMPLETED com os contadores finais.
- *  7. Em caso de falha inesperada, marca o job como FAILED e relança.
- *
- * A deduplicação de entrega (D6) fica a cargo do idempotent-consumer que
- * chama esta função — aqui não há verificação de jobId processado.
+ * Roteia para o handler correto com base no `kind` do payload:
+ *   - SALES_HISTORY  → persist-history
+ *   - COLLABORATION_SHEET → persist-collaboration-sheet
  */
 export async function processIngestionRequest(
   rawPayload: unknown,
   ports: IngestionWorkerPorts,
 ): Promise<void> {
   const payload = IngestionRequestPayload.parse(rawPayload);
-  const { jobId, objectUri, declaredLabels, scenarioId } = payload;
+  const { jobId, objectUri, declaredLabels, scenarioId, uploadedById, kind } = payload;
 
+  if (kind === 'COLLABORATION_SHEET') {
+    if (!ports.collaboration) {
+      throw new Error('CollaborationPort não configurado para COLLABORATION_SHEET');
+    }
+    const stream = await ports.objectStore.getStream(objectUri);
+    await persistCollaborationSheet(jobId, scenarioId, uploadedById, stream, {
+      job: ports.job,
+      collaboration: ports.collaboration,
+      issues: ports.issues,
+    });
+    return;
+  }
+
+  // SALES_HISTORY (and fallback for ACTUAL_SALES)
   await ports.job.startJob(jobId);
 
   try {

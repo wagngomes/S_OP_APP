@@ -90,3 +90,11 @@ export {
   MembersResponse,
   ScenarioMember,
 } from './http/members.js';
+
+export {
+  AdjustmentBody,
+  AdjustmentRecord,
+  CollaborationItemRow,
+  CollaborationItemsResponse,
+  SheetResponse,
+} from './http/collaboration.js';

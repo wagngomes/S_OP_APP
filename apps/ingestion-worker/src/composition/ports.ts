@@ -64,6 +64,32 @@ export type ObjectStorePort = {
   getStream(uri: string): Promise<NodeJS.ReadableStream>;
 };
 
+// --- Colaboração (planilha devolvida) ----------------------------------------
+
+export type CollaborationSheetItem = {
+  id: string;
+  scenarioId: string;
+  calculatedQuantity: string;
+  /** authorId do ajuste atual; null se nenhum ajuste ainda. */
+  currentAdjustmentAuthorId: string | null;
+};
+
+export type CollaborationPort = {
+  findItemsByIds(
+    scenarioId: string,
+    forecastItemIds: string[],
+  ): Promise<Map<string, CollaborationSheetItem>>;
+
+  createAdjustment(input: {
+    scenarioId: string;
+    forecastItemId: string;
+    authorId: string;
+    quantity: string;
+    reason: string;
+    origin: 'SPREADSHEET';
+  }): Promise<void>;
+};
+
 // --- Conjunto de ports injetado nos handlers ---------------------------------
 
 export type IngestionWorkerPorts = {
@@ -71,4 +97,5 @@ export type IngestionWorkerPorts = {
   issues: IssuePort;
   job: JobPort;
   objectStore: ObjectStorePort;
+  collaboration?: CollaborationPort;
 };

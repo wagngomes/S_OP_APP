@@ -258,22 +258,22 @@ planilha; ambos concluem e a fase encerra com as duas contribuições registrada
 
 - [X] T128 [P] [US3] Teste unitário da recusa de ajuste sem motivo em packages/domain/tests/collaboration/adjustment.test.ts (FR-058)
 - [X] T129 [P] [US3] Teste unitário do encadeamento de versões na edição concorrente em packages/domain/tests/collaboration/concurrency.test.ts (FR-066a)
-- [ ] T130 [P] [US3] Teste de integração da planilha devolvida com estrutura alterada sendo recusada integralmente, sem aplicação parcial, em apps/api/tests/integration/sheet-rejection.test.ts (FR-062)
-- [ ] T131 [P] [US3] Teste de integração da planilha antiga sinalizando itens já alterados por terceiros em apps/api/tests/integration/sheet-stale.test.ts (FR-066c)
-- [ ] T132 [P] [US3] Teste de integração do encerramento automático quando todos concluem em apps/api/tests/integration/collaboration-close.test.ts (FR-064)
+- [X] T130 [P] [US3] Teste de integração da planilha devolvida com estrutura alterada sendo recusada integralmente, sem aplicação parcial, em apps/api/tests/integration/sheet-rejection.test.ts (FR-062)
+- [X] T131 [P] [US3] Teste de integração da planilha antiga sinalizando itens já alterados por terceiros em apps/api/tests/integration/sheet-stale.test.ts (FR-066c)
+- [X] T132 [P] [US3] Teste de integração do encerramento automático quando todos concluem em apps/api/tests/integration/collaboration-close.test.ts (FR-064)
 
 ### Implementation for User Story 3
 
 - [X] T133 [P] [US3] Implementar as regras de ajuste com motivo obrigatório e preservação do calculado em packages/domain/src/collaboration/adjustment.ts (FR-057, FR-058, FR-059)
 - [X] T134 [P] [US3] Implementar a resolução determinística de edição concorrente via `supersededById` em packages/domain/src/collaboration/concurrency.ts (FR-066a)
-- [ ] T135 [US3] Implementar o service de colaboração gravando ajuste e AuditEvent na mesma transação em apps/api/src/services/collaboration.service.ts (FR-099)
-- [ ] T136 [US3] Implementar as rotas de colaboração, incluindo `expectedVersion` e resposta 409 `ITEM_CHANGED`, em apps/api/src/routes/v1/collaboration.routes.ts (FR-066b)
-- [ ] T137 [US3] Implementar a geração da planilha do cenário e a URL assinada do MinIO em apps/api/src/services/collaboration-sheet.service.ts (FR-060)
-- [ ] T138 [US3] Implementar a ingestão da planilha devolvida como job assíncrono, reusando o worker de ingestão, em apps/ingestion-worker/src/application/persist-collaboration-sheet.ts (FR-061, FR-062)
-- [ ] T139 [US3] Implementar o registro do "ok" sem alteração e o encerramento automático da fase em apps/api/src/services/collaboration.service.ts (FR-063, FR-064)
-- [ ] T140 [US3] Implementar o encerramento pelo criador com registro de quem não concluiu em apps/api/src/services/collaboration.service.ts (FR-065)
-- [ ] T141 [P] [US3] Implementar a tela de colaboração com calculado e colaborado lado a lado e motivo obrigatório em apps/web/src/app/scenarios/[id]/collaboration/
-- [ ] T142 [P] [US3] Implementar o download e o upload da planilha na tela de colaboração em apps/web/src/app/scenarios/[id]/collaboration/
+- [X] T135 [US3] Implementar o service de colaboração gravando ajuste e AuditEvent na mesma transação em apps/api/src/services/collaboration.service.ts (FR-099)
+- [X] T136 [US3] Implementar as rotas de colaboração, incluindo `expectedVersion` e resposta 409 `ITEM_CHANGED`, em apps/api/src/routes/v1/collaboration.routes.ts (FR-066b)
+- [X] T137 [US3] Implementar a geração da planilha do cenário e a URL assinada do MinIO em apps/api/src/services/collaboration-sheet.service.ts (FR-060)
+- [X] T138 [US3] Implementar a ingestão da planilha devolvida como job assíncrono, reusando o worker de ingestão, em apps/ingestion-worker/src/application/persist-collaboration-sheet.ts (FR-061, FR-062)
+- [X] T139 [US3] Implementar o registro do "ok" sem alteração e o encerramento automático da fase em apps/api/src/services/collaboration.service.ts (FR-063, FR-064)
+- [X] T140 [US3] Implementar o encerramento pelo criador com registro de quem não concluiu em apps/api/src/services/collaboration.service.ts (FR-065)
+- [X] T141 [P] [US3] Implementar a tela de colaboração com calculado e colaborado lado a lado e motivo obrigatório em apps/web/src/app/scenarios/[id]/collaboration/
+- [X] T142 [P] [US3] Implementar o download e o upload da planilha na tela de colaboração em apps/web/src/app/scenarios/[id]/collaboration/
 
 **Checkpoint**: US1, US2 e US3 funcionam independentemente
 

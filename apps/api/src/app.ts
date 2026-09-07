@@ -18,6 +18,7 @@ import { createMetrics, registerMetrics } from './observability/metrics.js';
 import { registerHealthRoutes } from './routes/health.js';
 import { registerAuthRoutes } from './routes/v1/auth.routes.js';
 import { registerApprovalRoutes } from './routes/v1/approval.routes.js';
+import { registerCollaborationRoutes } from './routes/v1/collaboration.routes.js';
 import { registerForecastRoutes } from './routes/v1/forecast.routes.js';
 import { registerIngestionRoutes } from './routes/v1/ingestion.routes.js';
 import { registerMemberRoutes } from './routes/v1/members.routes.js';
@@ -136,6 +137,15 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
           auth: deps.auth,
           scenarios: deps.scenarios,
           membership: deps.membership,
+        });
+      }
+      if (deps.auth && deps.scenarios && deps.membership && deps.collaboration && deps.datasets) {
+        registerCollaborationRoutes(instance, {
+          auth: deps.auth,
+          scenarios: deps.scenarios,
+          membership: deps.membership,
+          collaboration: deps.collaboration,
+          datasets: deps.datasets,
         });
       }
     },

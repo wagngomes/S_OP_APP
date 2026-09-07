@@ -325,6 +325,62 @@ export type ParquetReader = {
   readSeries(uri: string): Promise<ForecastSeriesInput[]>;
 };
 
+// --- Colaboração -------------------------------------------------------------
+
+export type CollaborationAdjustmentRecord = {
+  id: string;
+  scenarioId: string;
+  forecastItemId: string;
+  authorId: string;
+  /** Decimal string (Princípio V). */
+  quantity: string;
+  reason: string;
+  origin: 'UI' | 'SPREADSHEET';
+  supersededById: string | null;
+  createdAt: string;
+};
+
+export type CollaborationItemRecord = {
+  id: string;
+  productCode: string;
+  segments: string[];
+  year: number;
+  month: number;
+  /** Previsão calculada — imutável (Princípio II). */
+  calculatedQuantity: string;
+  currentAdjustment: CollaborationAdjustmentRecord | null;
+  /** Contador de ajustes para detecção de concorrência (FR-066b). */
+  version: number;
+};
+
+export type CollaborationRepository = {
+  createAdjustment(input: {
+    scenarioId: string;
+    forecastItemId: string;
+    authorId: string;
+    quantity: string;
+    reason: string;
+    origin: 'UI' | 'SPREADSHEET';
+  }): Promise<CollaborationAdjustmentRecord>;
+
+  listItemsWithAdjustments(
+    scenarioId: string,
+    page: { limit: number; offset: number },
+  ): Promise<{ data: CollaborationItemRecord[]; total: number }>;
+
+  findForecastItem(forecastItemId: string): Promise<{ id: string; scenarioId: string } | null>;
+
+  versionFor(forecastItemId: string): Promise<number>;
+
+  markDone(scenarioId: string, userId: string): Promise<void>;
+
+  allCollaboratorsDone(scenarioId: string): Promise<boolean>;
+
+  pendingCollaborators(
+    scenarioId: string,
+  ): Promise<{ userId: string | null; invitedEmail: string }[]>;
+};
+
 /** Dependências que o `buildApp` recebe. */
 export type AppDependencies = {
   health: HealthChecks;
@@ -342,6 +398,7 @@ export type AppDependencies = {
   parquet?: ParquetReader;
   membership?: MembershipRepository;
   notification?: NotificationPort;
+  collaboration?: CollaborationRepository;
   /** Sobrescreve o logger — usado nos testes para capturar o que foi emitido. */
   logger?: FastifyServerOptions['logger'];
 };

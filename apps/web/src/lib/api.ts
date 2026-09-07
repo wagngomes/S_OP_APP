@@ -299,3 +299,88 @@ export async function listForecastItems(
   const qs = params.size > 0 ? `?${params}` : '';
   return request(`/api/v1/scenarios/${scenarioId}/forecast-items${qs}`);
 }
+
+// --- Colaboração -------------------------------------------------------------
+
+export type CollaborationAdjustment = {
+  id: string;
+  forecastItemId: string;
+  authorId: string;
+  quantity: string;
+  reason: string;
+  origin: 'UI' | 'SPREADSHEET';
+  createdAt: string;
+};
+
+export type CollaborationItemRow = {
+  id: string;
+  productCode: string;
+  segments: string[];
+  year: number;
+  month: number;
+  calculatedQuantity: string;
+  currentAdjustment: CollaborationAdjustment | null;
+  version: number;
+};
+
+export async function listCollaborationItems(
+  scenarioId: string,
+  page?: { limit?: number; offset?: number },
+): Promise<{ data: CollaborationItemRow[]; total: number; limit: number; offset: number }> {
+  const params = new URLSearchParams();
+  if (page?.limit) params.set('limit', String(page.limit));
+  if (page?.offset) params.set('offset', String(page.offset));
+  const qs = params.size > 0 ? `?${params}` : '';
+  return request(`/api/v1/scenarios/${scenarioId}/collaboration/items${qs}`);
+}
+
+export async function submitAdjustment(
+  scenarioId: string,
+  body: {
+    forecastItemId: string;
+    quantity: string;
+    reason: string;
+    expectedVersion?: number;
+  },
+): Promise<CollaborationAdjustment> {
+  return request(`/api/v1/scenarios/${scenarioId}/collaboration/adjustments`, {
+    method: 'POST',
+    body,
+  });
+}
+
+export async function markCollaborationDone(scenarioId: string): Promise<void> {
+  await request(`/api/v1/scenarios/${scenarioId}/collaboration/done`, { method: 'POST' });
+}
+
+export async function closeCollaboration(scenarioId: string): Promise<void> {
+  await request(`/api/v1/scenarios/${scenarioId}/collaboration/close`, { method: 'POST' });
+}
+
+export type SheetInfo = { url: string; expiresAt: string };
+
+export async function getCollaborationSheet(scenarioId: string): Promise<SheetInfo> {
+  return request(`/api/v1/scenarios/${scenarioId}/collaboration/sheet`);
+}
+
+export async function uploadCollaborationSheet(
+  scenarioId: string,
+  file: File,
+): Promise<{ jobId: string }> {
+  const form = new FormData();
+  form.append('kind', 'COLLABORATION_SHEET');
+  form.append('declaredLabels', 'n/a');
+  form.append('file', file);
+  const res = await fetch(`${BASE_URL}/api/v1/scenarios/${scenarioId}/uploads`, {
+    method: 'POST',
+    credentials: 'include',
+    body: form,
+  });
+  const contentType = res.headers.get('content-type') ?? '';
+  const data = contentType.includes('application/json') ? await res.json() : null;
+  if (!res.ok) {
+    const msg = (data as { error?: { message?: string } } | null)?.error?.message ?? `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  return data as { jobId: string };
+}

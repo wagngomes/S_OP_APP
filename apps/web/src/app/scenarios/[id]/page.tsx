@@ -23,6 +23,9 @@ export default function ScenarioPage() {
         case 'APPROVAL':
           router.replace(`/scenarios/${id}/approval`);
           break;
+        case 'COLLABORATION':
+          router.replace(`/scenarios/${id}/collaboration`);
+          break;
         default:
           break;
       }
