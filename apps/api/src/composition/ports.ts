@@ -189,6 +189,15 @@ export type NotificationPort = {
     approverEmails: string[];
     correlationId: string;
   }): Promise<void>;
+
+  /** FR-093 — notifica membros quando a fase avança. */
+  notifyPhaseAdvanced(input: {
+    scenarioId: string;
+    scenarioName: string;
+    phase: string;
+    recipientEmails: string[];
+    correlationId: string;
+  }): Promise<void>;
 };
 
 // --- Ingestão -----------------------------------------------------------------

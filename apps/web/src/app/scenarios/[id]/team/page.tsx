@@ -9,6 +9,7 @@ import {
   type MemberRole,
   type ScenarioMember,
 } from '../../../../lib/api';
+import { PhaseContext } from '../../../../components/phase/PhaseContext';
 
 const ROLE_LABELS: Record<MemberRole, string> = {
   CREATOR: 'Criador',
@@ -90,7 +91,8 @@ export default function TeamPage() {
         ← Voltar
       </button>
 
-      <h1 className="mb-6 text-2xl font-bold text-titulo">Montagem de equipe</h1>
+      <h1 className="mb-4 text-2xl font-bold text-titulo">Montagem de equipe</h1>
+      <PhaseContext phase="TEAM_SETUP" className="mb-6" />
 
       {/* Formulário de convite */}
       <form

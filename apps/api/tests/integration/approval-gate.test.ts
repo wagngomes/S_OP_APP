@@ -77,6 +77,7 @@ class FakeParquetReader implements ParquetReader {
 class FakeNotification implements NotificationPort {
   readonly calls: unknown[] = [];
   async notifyForecastReady(input: unknown): Promise<void> { this.calls.push(input); }
+  async notifyPhaseAdvanced(input: unknown): Promise<void> { this.calls.push(input); }
 }
 
 // --- Setup -------------------------------------------------------------------

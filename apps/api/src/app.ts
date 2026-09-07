@@ -138,6 +138,7 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
           auth: deps.auth,
           scenarios: deps.scenarios,
           membership: deps.membership,
+          notification: deps.notification,
         });
       }
       if (deps.auth && deps.scenarios && deps.membership && deps.collaboration && deps.datasets) {

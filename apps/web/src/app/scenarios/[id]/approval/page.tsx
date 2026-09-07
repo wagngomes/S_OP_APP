@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { submitApprovalDecision } from '../../../../lib/api';
+import { PhaseContext } from '../../../../components/phase/PhaseContext';
 
 export default function ApprovalPage() {
   const { id } = useParams<{ id: string }>();
@@ -44,6 +45,7 @@ export default function ApprovalPage() {
       </button>
 
       <h1 className="mb-2 text-2xl font-bold text-titulo">Revisão e aprovação</h1>
+      <PhaseContext phase="APPROVAL" className="mb-4" />
       <p className="mb-6 text-sm text-texto-principal/60">
         Avalie a previsão calculada e registre sua decisão.
       </p>

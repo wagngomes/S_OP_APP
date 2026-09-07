@@ -12,7 +12,7 @@ Projeto conduzido pelo fluxo Spec Kit. As quatro etapas de planejamento estão
 Tarefas concluídas estão marcadas `[X]`. Ao retomar, leia esse arquivo primeiro e
 continue pela primeira tarefa não marcada que faça sentido na ordem de fases.
 
-Estado no último commit desta máquina: **154 de 198 tarefas, ~562 testes passando.**
+Estado no último commit desta máquina: **164 de 198 tarefas, ~359 testes passando (3 falhas pré-existentes em audit-transaction.test.ts por coluna `users.emailVerifiedAt` ausente no DB local).**
 
 ## Ordem de leitura ao retomar
 
@@ -95,12 +95,28 @@ junctions do Windows sobrescrevem os symlinks do pnpm no container Alpine.
 
 ## O que ainda não existe
 
-Worker de e-mail e a acuracidade (US5, US6). O ciclo S&OP completo (auth →
-cenário → equipe → aprovação → colaboração → consenso → publicação) está
-implementado de ponta a ponta.
+Acuracidade (US6). O ciclo S&OP completo (auth → cenário → equipe → aprovação
+→ colaboração → consenso → publicação) está implementado de ponta a ponta,
+incluindo o worker de e-mail.
 
-**Fase 6 (US4) concluída** — consenso e publicação implementados (T143-T154).
-Próximas tarefas: Phase 7 (US5) — worker de e-mail e notificações (T155-T164).
+**Fase 7 (US5) concluída** — worker de e-mail e notificações implementados (T155-T164).
+Próximas tarefas: Phase 8 (US6) — apuração de acuracidade (T165-T178).
+
+Componentes implementados em US5 (T155-T164):
+- `packages/contracts/src/messaging/email.ts` — `EmailTemplate`, `EmailRequestPayload` (z.record key/value fix para Zod v4)
+- `apps/api/src/composition/ports.ts` — `NotificationPort.notifyPhaseAdvanced` adicionado
+- `apps/api/src/services/notification.service.ts` — `NotificationService.safeNotifyPhaseAdvanced` (FR-096)
+- `apps/api/src/routes/v1/approval.routes.ts` — chama notificação após APPROVE (try/catch isolado)
+- `apps/api/src/adapters/rabbitmq/notification.ts` — `notifyPhaseAdvanced` + refactor para 1 msg por destinatário
+- `apps/email-worker/src/composition/ports.ts` — `EmailSenderPort`, `NotificationStatusPort`
+- `apps/email-worker/src/application/templates/index.ts` — renderTemplate (3 templates HTML)
+- `apps/email-worker/src/adapters/resend.ts` — `ResendEmailSender` (D12)
+- `apps/email-worker/src/application/notification-status.ts` — `recordSent`, `recordFailed`
+- `apps/email-worker/src/messaging/retry-consumer.ts` — `consumeWithRetry` (backoff 1s/8s/64s, DLQ)
+- `apps/email-worker/src/messaging/email.consumer.ts` — `processEmailRequest`
+- `apps/web/src/components/phase/PhaseContext.tsx` — indicador de fase e ação esperada (FR-097)
+- `apps/web/src/app/scenarios/page.tsx` — badges de fase coloridos e localizados (FR-095)
+- `apps/web/next.config.ts` — `eslint.ignoreDuringBuilds: true` (lint é passo separado no CI)
 
 Componentes implementados em US4:
 - `packages/contracts/src/http/consensus.ts` — contratos de tolerância, decisão, item e publicado

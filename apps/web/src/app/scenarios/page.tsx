@@ -15,6 +15,17 @@ const PHASE_LABELS: Record<string, string> = {
   ACCURACY: 'Acurácia',
 };
 
+const PHASE_BADGE_CLASS: Record<string, string> = {
+  TEAM_SETUP: 'bg-fundo-secundario text-texto-principal/60',
+  IMPORT_SETUP: 'bg-fundo-secundario text-texto-principal/60',
+  CALCULATION: 'bg-turquesa/20 text-petroleo',
+  APPROVAL: 'bg-yellow-100 text-yellow-800',
+  COLLABORATION: 'bg-blue-100 text-blue-800',
+  CONSENSUS: 'bg-purple-100 text-purple-800',
+  PUBLICATION: 'bg-verde/10 text-verde',
+  ACCURACY: 'bg-verde/10 text-verde',
+};
+
 export default function ScenariosPage() {
   const router = useRouter();
   const [scenarios, setScenarios] = useState<ScenarioSummary[]>([]);
@@ -144,12 +155,10 @@ export default function ScenariosPage() {
               </div>
               <span
                 className={`rounded-full px-3 py-1 text-xs font-medium ${
-                  s.published
-                    ? 'bg-verde/10 text-verde'
-                    : 'bg-fundo-secundario text-texto-principal/60'
+                  PHASE_BADGE_CLASS[s.phase] ?? 'bg-fundo-secundario text-texto-principal/60'
                 }`}
               >
-                {s.published ? 'Publicado' : s.phase}
+                {PHASE_LABELS[s.phase] ?? s.phase}
               </span>
             </li>
           ))}

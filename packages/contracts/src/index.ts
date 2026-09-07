@@ -110,3 +110,8 @@ export {
   PublishedForecastRow,
   ToleranceBody,
 } from './http/consensus.js';
+
+export {
+  EmailRequestPayload,
+  EmailTemplate,
+} from './messaging/email.js';

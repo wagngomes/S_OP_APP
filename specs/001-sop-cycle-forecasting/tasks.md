@@ -319,19 +319,19 @@ e-mail correspondente sai aos envolvidos.
 
 ### Tests for User Story 5
 
-- [ ] T155 [P] [US5] Teste de integração provando que a falha de envio de e-mail NÃO desfaz o avanço de fase em apps/api/tests/integration/email-failure-isolation.test.ts (FR-096)
-- [ ] T156 [P] [US5] Teste de integração da retentativa e do roteamento para DLQ em apps/email-worker/tests/integration/retry-dlq.test.ts
-- [ ] T157 [P] [US5] Teste de contrato de `email.request` em packages/contracts/tests/email.contract.test.ts
+- [X] T155 [P] [US5] Teste de integração provando que a falha de envio de e-mail NÃO desfaz o avanço de fase em apps/api/tests/integration/email-failure-isolation.test.ts (FR-096)
+- [X] T156 [P] [US5] Teste de integração da retentativa e do roteamento para DLQ em apps/email-worker/tests/integration/retry-dlq.test.ts
+- [X] T157 [P] [US5] Teste de contrato de `email.request` em packages/contracts/tests/email.contract.test.ts
 
 ### Implementation for User Story 5
 
-- [ ] T158 [US5] Implementar a publicação de EmailNotification em transação separada da transição de fase em apps/api/src/services/notification.service.ts (FR-093, FR-096)
-- [ ] T159 [US5] Implementar o consumidor de `sop.email.request.v1` em apps/email-worker/src/messaging/email.consumer.ts
-- [ ] T160 [US5] Implementar o adaptador Resend com API key por variável de ambiente em apps/email-worker/src/adapters/resend.ts (D12)
-- [ ] T161 [P] [US5] Implementar os templates FORECAST_READY, PHASE_ADVANCED e COLLABORATION_OPENED em apps/email-worker/src/application/templates/ (FR-094)
-- [ ] T162 [US5] Implementar a atualização de status, tentativas e último erro da notificação em apps/email-worker/src/application/notification-status.ts
-- [ ] T163 [P] [US5] Implementar a exibição da fase atual na listagem de cenários em apps/web/src/app/scenarios/ (FR-095)
-- [ ] T164 [P] [US5] Implementar a indicação do que se espera do usuário na fase atual e o bloqueio visual das ações indisponíveis em apps/web/src/components/phase/ (FR-016, FR-097)
+- [X] T158 [US5] Implementar a publicação de EmailNotification em transação separada da transição de fase em apps/api/src/services/notification.service.ts (FR-093, FR-096)
+- [X] T159 [US5] Implementar o consumidor de `sop.email.request.v1` em apps/email-worker/src/messaging/email.consumer.ts
+- [X] T160 [US5] Implementar o adaptador Resend com API key por variável de ambiente em apps/email-worker/src/adapters/resend.ts (D12)
+- [X] T161 [P] [US5] Implementar os templates FORECAST_READY, PHASE_ADVANCED e COLLABORATION_OPENED em apps/email-worker/src/application/templates/ (FR-094)
+- [X] T162 [US5] Implementar a atualização de status, tentativas e último erro da notificação em apps/email-worker/src/application/notification-status.ts
+- [X] T163 [P] [US5] Implementar a exibição da fase atual na listagem de cenários em apps/web/src/app/scenarios/ (FR-095)
+- [X] T164 [P] [US5] Implementar a indicação do que se espera do usuário na fase atual e o bloqueio visual das ações indisponíveis em apps/web/src/components/phase/ (FR-016, FR-097)
 
 **Checkpoint**: o ciclo é acompanhável e notificado ponta a ponta
 
