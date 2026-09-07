@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DecimalString } from '../decimal/decimal-string.js';
+import { DecimalString, DecimalStringOut } from '../decimal/decimal-string.js';
 import { Paginated } from './common.js';
 
 /**
@@ -25,7 +25,7 @@ export const AdjustmentRecord = z.object({
   id: z.uuid(),
   forecastItemId: z.uuid(),
   authorId: z.string(),
-  quantity: DecimalString(),
+  quantity: DecimalStringOut(),
   reason: z.string(),
   origin: z.enum(['UI', 'SPREADSHEET']),
   createdAt: z.iso.datetime(),
@@ -41,7 +41,7 @@ export const CollaborationItemRow = z.object({
   year: z.int(),
   month: z.int(),
   /** Previsão calculada pelo motor — imutável (Princípio II). */
-  calculatedQuantity: DecimalString(),
+  calculatedQuantity: DecimalStringOut(),
   /** Ajuste vigente, se houver; null = sem alteração. */
   currentAdjustment: AdjustmentRecord.nullable(),
   /** Número total de ajustes para detecção de edição concorrente (FR-066b). */

@@ -291,20 +291,20 @@ publicado é o consensado.
 ### Tests for User Story 4
 
 - [X] T143 [P] [US4] Teste unitário do cálculo de divergência e da classificação dentro/fora da faixa em packages/domain/tests/consensus/divergence.test.ts (FR-067, FR-068)
-- [ ] T144 [P] [US4] Teste de integração recusando decisão de quem não é o responsável em apps/api/tests/integration/consensus-authorization.test.ts (FR-071)
-- [ ] T145 [P] [US4] Teste de integração recusando publicação com item sem decisão em apps/api/tests/integration/publish-gate.test.ts (FR-073)
-- [ ] T146 [P] [US4] Teste de integração provando a imutabilidade do publicado em apps/api/tests/integration/published-immutability.test.ts (FR-076)
+- [X] T144 [P] [US4] Teste de integração recusando decisão de quem não é o responsável em apps/api/tests/integration/consensus-authorization.test.ts (FR-071)
+- [X] T145 [P] [US4] Teste de integração recusando publicação com item sem decisão em apps/api/tests/integration/publish-gate.test.ts (FR-073)
+- [X] T146 [P] [US4] Teste de integração provando a imutabilidade do publicado em apps/api/tests/integration/published-immutability.test.ts (FR-076)
 
 ### Implementation for User Story 4
 
 - [X] T147 [P] [US4] Implementar divergência, faixa absoluta e percentual em packages/domain/src/consensus/divergence.ts (FR-067, FR-068)
 - [X] T148 [P] [US4] Implementar a regra de quem decide em packages/domain/src/consensus/decision-rules.ts (FR-071)
-- [ ] T149 [US4] Implementar o service de consenso com registro de autor, origem e deltas em apps/api/src/services/consensus.service.ts (FR-070, FR-072)
-- [ ] T150 [US4] Implementar as rotas de tolerância, listagem ordenável por `delta_desc` e decisão em apps/api/src/routes/v1/consensus.routes.ts (FR-069)
-- [ ] T151 [US4] Implementar a publicação copiando o consensado para PublishedForecast e avançando a fase em apps/api/src/services/publication.service.ts (FR-074, FR-075)
-- [ ] T152 [US4] Implementar a rota de leitura da previsão publicada, somente leitura, em apps/api/src/routes/v1/published.routes.ts (FR-076, FR-077)
-- [ ] T153 [P] [US4] Implementar a tela de consenso com ordenação por divergência e decisão item a item em apps/web/src/app/scenarios/[id]/consensus/
-- [ ] T154 [P] [US4] Implementar a tela de publicação e visualização do número oficial em apps/web/src/app/scenarios/[id]/published/
+- [X] T149 [US4] Implementar o service de consenso com registro de autor, origem e deltas em apps/api/src/services/consensus.service.ts (FR-070, FR-072)
+- [X] T150 [US4] Implementar as rotas de tolerância, listagem ordenável por `delta_desc` e decisão em apps/api/src/routes/v1/consensus.routes.ts (FR-069)
+- [X] T151 [US4] Implementar a publicação copiando o consensado para PublishedForecast e avançando a fase em apps/api/src/services/publication.service.ts (FR-074, FR-075)
+- [X] T152 [US4] Implementar a rota de leitura da previsão publicada, somente leitura, em apps/api/src/routes/v1/consensus.routes.ts (FR-076, FR-077)
+- [X] T153 [P] [US4] Implementar a tela de consenso com ordenação por divergência e decisão item a item em apps/web/src/app/scenarios/[id]/consensus/
+- [X] T154 [P] [US4] Implementar a tela de publicação e visualização do número oficial em apps/web/src/app/scenarios/[id]/published/
 
 **Checkpoint**: ciclo completo até a publicação funcionando
 

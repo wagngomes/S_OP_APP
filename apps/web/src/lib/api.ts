@@ -384,3 +384,99 @@ export async function uploadCollaborationSheet(
   }
   return data as { jobId: string };
 }
+
+// --- Consenso ----------------------------------------------------------------
+
+export type ConsensusDecision = {
+  id: string;
+  forecastItemId: string;
+  decidedById: string;
+  source: 'CALCULATED' | 'COLLABORATED' | 'MANUAL';
+  quantity: string;
+  reason: string | null;
+  decidedAt: string;
+};
+
+export type DivergenceInfo = {
+  signed: string;
+  absolute: string;
+  percent: string | null;
+};
+
+export type ConsensusItemRow = {
+  id: string;
+  productCode: string;
+  segments: string[];
+  year: number;
+  month: number;
+  calculatedQuantity: string;
+  collaboratedQuantity: string | null;
+  currentDecision: ConsensusDecision | null;
+  divergence: DivergenceInfo;
+  withinTolerance: boolean;
+};
+
+export async function listConsensusItems(
+  scenarioId: string,
+  page?: { limit?: number; offset?: number; sort?: 'delta_desc' | 'default' },
+): Promise<{ data: ConsensusItemRow[]; total: number; limit: number; offset: number }> {
+  const params = new URLSearchParams();
+  if (page?.limit) params.set('limit', String(page.limit));
+  if (page?.offset) params.set('offset', String(page.offset));
+  if (page?.sort) params.set('sort', page.sort);
+  const qs = params.size > 0 ? `?${params}` : '';
+  return request(`/api/v1/scenarios/${scenarioId}/consensus/items${qs}`);
+}
+
+export async function decideConsensusItem(
+  scenarioId: string,
+  body: {
+    forecastItemId: string;
+    source: 'CALCULATED' | 'COLLABORATED' | 'MANUAL';
+    quantity: string;
+    reason?: string;
+  },
+): Promise<ConsensusDecision> {
+  return request(`/api/v1/scenarios/${scenarioId}/consensus/decisions`, {
+    method: 'POST',
+    body,
+  });
+}
+
+export async function setConsensusTolerance(
+  scenarioId: string,
+  body: { value: string; kind: 'ABSOLUTE' | 'PERCENT' },
+): Promise<void> {
+  await request(`/api/v1/scenarios/${scenarioId}/consensus/tolerance`, {
+    method: 'PUT',
+    body,
+  });
+}
+
+export async function publishConsensus(scenarioId: string): Promise<void> {
+  await request(`/api/v1/scenarios/${scenarioId}/publication`, { method: 'POST' });
+}
+
+// --- Publicado ---------------------------------------------------------------
+
+export type PublishedForecastRow = {
+  id: string;
+  forecastItemId: string;
+  productCode: string;
+  segments: string[];
+  year: number;
+  month: number;
+  quantity: string;
+  publishedAt: string;
+};
+
+export async function listPublishedForecast(
+  scenarioId: string,
+  page?: { limit?: number; offset?: number },
+): Promise<{ data: PublishedForecastRow[]; total: number; limit: number; offset: number }> {
+  const params = new URLSearchParams();
+  if (page?.limit) params.set('limit', String(page.limit));
+  if (page?.offset) params.set('offset', String(page.offset));
+  const qs = params.size > 0 ? `?${params}` : '';
+  return request(`/api/v1/scenarios/${scenarioId}/published-forecast${qs}`);
+}

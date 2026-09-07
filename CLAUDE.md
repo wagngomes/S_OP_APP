@@ -12,7 +12,7 @@ Projeto conduzido pelo fluxo Spec Kit. As quatro etapas de planejamento estão
 Tarefas concluídas estão marcadas `[X]`. Ao retomar, leia esse arquivo primeiro e
 continue pela primeira tarefa não marcada que faça sentido na ordem de fases.
 
-Estado no último commit desta máquina: **125 de 198 tarefas, ~543 testes passando.**
+Estado no último commit desta máquina: **154 de 198 tarefas, ~562 testes passando.**
 
 ## Ordem de leitura ao retomar
 
@@ -95,13 +95,28 @@ junctions do Windows sobrescrevem os symlinks do pnpm no container Alpine.
 
 ## O que ainda não existe
 
-Worker de e-mail e as rotas do ciclo de aprovação/colaboração/consenso/publicação —
-cujas **regras de negócio já estão prontas e testadas** em `packages/domain`; falta
-a fiação HTTP sobre elas. Frontend tem telas de auth e cenários; falta upload,
-parametrização, resultado.
+Worker de e-mail e a acuracidade (US5, US6). O ciclo S&OP completo (auth →
+cenário → equipe → aprovação → colaboração → consenso → publicação) está
+implementado de ponta a ponta.
 
-**Fase 4 (US2) concluída** — equipe, papéis e aprovação implementados (T116-T127).
-Próximas tarefas: Phase 5 (US3) — colaboração com justificativa (T128-T148).
+**Fase 6 (US4) concluída** — consenso e publicação implementados (T143-T154).
+Próximas tarefas: Phase 7 (US5) — worker de e-mail e notificações (T155-T164).
+
+Componentes implementados em US4:
+- `packages/contracts/src/http/consensus.ts` — contratos de tolerância, decisão, item e publicado
+- `packages/contracts/src/decimal/decimal-string.ts` — `DecimalStringOut()` sem transform para response schemas (Zod v4 requer schemas sem transform no encode)
+- `apps/api/src/services/`: ConsensusService, PublicationService
+- `apps/api/src/routes/v1/consensus.routes.ts` — tolerância, itens (sort delta_desc), decisão, publicação, publicado
+- `apps/api/src/adapters/prisma/consensus.repository.ts` — listItemsForConsensus, createDecision (upsert), allItemsDecided, publishForecast, listPublished
+- `apps/web/src/app/scenarios/[id]/consensus/` e `/published/`
+- Roteamento: CONSENSUS→/consensus, PUBLICATION+ACCURACY→/published em scenarios/[id]/page.tsx
+
+Componentes implementados em US3 (T128-T142):
+- `packages/contracts/src/http/collaboration.ts` — contratos de ajuste, item, planilha
+- `apps/api/src/services/collaboration.service.ts`
+- `apps/api/src/routes/v1/collaboration.routes.ts`
+- `apps/ingestion-worker/src/application/persist-collaboration-sheet.ts`
+- `apps/web/src/app/scenarios/[id]/collaboration/`
 
 Componentes implementados em US2:
 - `packages/contracts/src/http/members.ts` — contratos InviteMember, ScenarioMember, ApprovalDecision

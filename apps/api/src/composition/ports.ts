@@ -79,6 +79,9 @@ export type ScenarioRecord = {
   finalSayRole: 'CREATOR' | 'APPROVER';
   teamClosedAt: string | null;
   forecastHorizonMonths: number;
+  /** Valor numérico da faixa de tolerância para consenso (string decimal). */
+  consensusToleranceValue: string | null;
+  consensusToleranceKind: 'ABSOLUTE' | 'PERCENT' | null;
   publishedAt: string | null;
   createdAt: string;
 };
@@ -141,6 +144,12 @@ export type ScenarioRepository = {
 
   /** FR-013 — marca a equipe como fechada. */
   setTeamClosed(scenarioId: string): Promise<void>;
+
+  /** FR-069 — define a faixa de tolerância para o consenso. */
+  setTolerance(scenarioId: string, tolerance: ToleranceUpdate | null): Promise<void>;
+
+  /** FR-075 — registra a data de publicação. */
+  setPublishedAt(scenarioId: string): Promise<void>;
 };
 
 // --- Membros -----------------------------------------------------------------
@@ -381,6 +390,73 @@ export type CollaborationRepository = {
   ): Promise<{ userId: string | null; invitedEmail: string }[]>;
 };
 
+// --- Consenso ----------------------------------------------------------------
+
+export type ConsensusDecisionRecord = {
+  id: string;
+  forecastItemId: string;
+  decidedById: string;
+  source: 'CALCULATED' | 'COLLABORATED' | 'MANUAL';
+  quantity: string;
+  reason: string | null;
+  decidedAt: string;
+};
+
+export type ConsensusItemRecord = {
+  id: string;
+  productCode: string;
+  segments: string[];
+  year: number;
+  month: number;
+  calculatedQuantity: string;
+  collaboratedQuantity: string | null;
+  currentDecision: ConsensusDecisionRecord | null;
+};
+
+export type PublishedForecastRecord = {
+  id: string;
+  forecastItemId: string;
+  productCode: string;
+  segments: string[];
+  year: number;
+  month: number;
+  quantity: string;
+  publishedAt: string;
+};
+
+export type ConsensusRepository = {
+  listItemsForConsensus(
+    scenarioId: string,
+    page: { limit: number; offset: number },
+  ): Promise<{ data: ConsensusItemRecord[]; total: number }>;
+
+  createDecision(input: {
+    forecastItemId: string;
+    decidedById: string;
+    source: 'CALCULATED' | 'COLLABORATED' | 'MANUAL';
+    quantity: string;
+    reason?: string;
+    calculatedQuantity: string;
+    collaboratedQuantity: string | null;
+  }): Promise<ConsensusDecisionRecord>;
+
+  /** Verifica se há algum item sem decisão para o job mais recente. */
+  allItemsDecided(scenarioId: string): Promise<boolean>;
+
+  /** Copia as decisões para PublishedForecast e define publishedAt no cenário. */
+  publishForecast(scenarioId: string): Promise<void>;
+
+  listPublished(
+    scenarioId: string,
+    page: { limit: number; offset: number },
+  ): Promise<{ data: PublishedForecastRecord[]; total: number }>;
+};
+
+export type ToleranceUpdate = {
+  value: string;
+  kind: 'ABSOLUTE' | 'PERCENT';
+};
+
 /** Dependências que o `buildApp` recebe. */
 export type AppDependencies = {
   health: HealthChecks;
@@ -399,6 +475,7 @@ export type AppDependencies = {
   membership?: MembershipRepository;
   notification?: NotificationPort;
   collaboration?: CollaborationRepository;
+  consensus?: ConsensusRepository;
   /** Sobrescreve o logger — usado nos testes para capturar o que foi emitido. */
   logger?: FastifyServerOptions['logger'];
 };

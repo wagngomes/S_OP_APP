@@ -19,6 +19,7 @@ import { registerHealthRoutes } from './routes/health.js';
 import { registerAuthRoutes } from './routes/v1/auth.routes.js';
 import { registerApprovalRoutes } from './routes/v1/approval.routes.js';
 import { registerCollaborationRoutes } from './routes/v1/collaboration.routes.js';
+import { registerConsensusRoutes } from './routes/v1/consensus.routes.js';
 import { registerForecastRoutes } from './routes/v1/forecast.routes.js';
 import { registerIngestionRoutes } from './routes/v1/ingestion.routes.js';
 import { registerMemberRoutes } from './routes/v1/members.routes.js';
@@ -146,6 +147,14 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
           membership: deps.membership,
           collaboration: deps.collaboration,
           datasets: deps.datasets,
+        });
+      }
+      if (deps.auth && deps.scenarios && deps.membership && deps.consensus) {
+        registerConsensusRoutes(instance, {
+          auth: deps.auth,
+          scenarios: deps.scenarios,
+          membership: deps.membership,
+          consensus: deps.consensus,
         });
       }
     },

@@ -2,6 +2,7 @@ export {
   DECIMAL_ROUNDING,
   DECIMAL_SCALE,
   DecimalString,
+  DecimalStringOut,
   isDecimalString,
   quantize,
   toDecimal,
@@ -98,3 +99,14 @@ export {
   CollaborationItemsResponse,
   SheetResponse,
 } from './http/collaboration.js';
+
+export {
+  ConsensusDecisionBody,
+  ConsensusDecisionRecord,
+  ConsensusItemRow,
+  ConsensusItemsResponse,
+  DivergenceInfo,
+  PublishedForecastResponse,
+  PublishedForecastRow,
+  ToleranceBody,
+} from './http/consensus.js';

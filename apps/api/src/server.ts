@@ -18,6 +18,7 @@ import { PrismaIngestionRepository } from './adapters/prisma/ingestion.repositor
 import { PrismaForecastRepository } from './adapters/prisma/forecast.repository.js';
 import { PrismaForecastItemRepository } from './adapters/prisma/forecast-item.repository.js';
 import { PrismaCollaborationRepository } from './adapters/prisma/collaboration.repository.js';
+import { PrismaConsensusRepository } from './adapters/prisma/consensus.repository.js';
 
 const PORT = Number(process.env.API_PORT ?? 3001);
 const AMQP_URL = process.env.AMQP_URL ?? 'amqp://sop:troque-em-producao@localhost:5672';
@@ -35,6 +36,7 @@ const ingestion = new PrismaIngestionRepository(prisma);
 const forecast = new PrismaForecastRepository(prisma);
 const forecastItems = new PrismaForecastItemRepository(prisma);
 const collaboration = new PrismaCollaborationRepository(prisma);
+const consensus = new PrismaConsensusRepository(prisma);
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
@@ -132,6 +134,7 @@ const deps: AppDependencies = {
   membership,
   notification,
   collaboration,
+  consensus,
 };
 
 const app = await buildApp(deps);

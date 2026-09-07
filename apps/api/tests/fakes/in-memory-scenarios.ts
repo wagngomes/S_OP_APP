@@ -9,6 +9,7 @@ import type {
   ScenarioRecord,
   ScenarioRepository,
   SegmentationLevelRecord,
+  ToleranceUpdate,
 } from '../../src/composition/ports.js';
 
 /**
@@ -54,6 +55,8 @@ export class InMemoryScenarios implements ScenarioRepository {
       finalSayRole: input.finalSayRole,
       teamClosedAt: null,
       forecastHorizonMonths: input.forecastHorizonMonths,
+      consensusToleranceValue: null,
+      consensusToleranceKind: null,
       publishedAt: null,
       createdAt: new Date().toISOString(),
     };
@@ -116,6 +119,24 @@ export class InMemoryScenarios implements ScenarioRepository {
     const s = this.scenarios.get(scenarioId);
     if (s) {
       this.scenarios.set(scenarioId, { ...s, teamClosedAt: new Date().toISOString() });
+    }
+  }
+
+  async setTolerance(scenarioId: string, tolerance: ToleranceUpdate | null): Promise<void> {
+    const s = this.scenarios.get(scenarioId);
+    if (s) {
+      this.scenarios.set(scenarioId, {
+        ...s,
+        consensusToleranceValue: tolerance?.value ?? null,
+        consensusToleranceKind: tolerance?.kind ?? null,
+      });
+    }
+  }
+
+  async setPublishedAt(scenarioId: string): Promise<void> {
+    const s = this.scenarios.get(scenarioId);
+    if (s) {
+      this.scenarios.set(scenarioId, { ...s, publishedAt: new Date().toISOString() });
     }
   }
 

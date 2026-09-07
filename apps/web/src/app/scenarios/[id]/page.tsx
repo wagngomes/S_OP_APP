@@ -26,6 +26,13 @@ export default function ScenarioPage() {
         case 'COLLABORATION':
           router.replace(`/scenarios/${id}/collaboration`);
           break;
+        case 'CONSENSUS':
+          router.replace(`/scenarios/${id}/consensus`);
+          break;
+        case 'PUBLICATION':
+        case 'ACCURACY':
+          router.replace(`/scenarios/${id}/published`);
+          break;
         default:
           break;
       }

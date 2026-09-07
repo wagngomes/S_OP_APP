@@ -32,17 +32,32 @@ export function isDecimalString(value: unknown, scale: number = DECIMAL_SCALE): 
 }
 
 /**
- * Schema Zod para todo campo de grandeza sensível.
+ * Schema Zod para todo campo de grandeza sensível em REQUEST (body, querystring).
  *
- * Use SEMPRE isto no lugar de `z.number()`. Um número JSON seria convertido
- * para double pelo parser antes de qualquer validação — o erro entraria antes
- * de haver o que validar.
+ * Normaliza a string de entrada para exatamente `scale` casas decimais via
+ * `.transform()`. Use SEMPRE no lugar de `z.number()`.
+ *
+ * NÃO use em response schemas — Zod v4 proíbe transforms durante encode.
+ * Para response schemas, use `DecimalStringOut()`.
  */
 export function DecimalString(scale: number = DECIMAL_SCALE) {
   return z
     .string({ error: 'grandeza sensível deve trafegar como string decimal' })
     .regex(grammar(scale), `decimal inválido: esperado até ${scale} casas, sem notação científica`)
     .transform((s) => new Decimal(s).toFixed(scale));
+}
+
+/**
+ * Schema Zod para campo de grandeza sensível em RESPONSE (response schemas).
+ *
+ * Apenas valida a gramática, sem transform — Zod v4 lança ZodEncodeError
+ * se um transform unidirecional aparecer durante a serialização de resposta.
+ * Os valores de saída do sistema já estão canonicalizados; validar é suficiente.
+ */
+export function DecimalStringOut(scale: number = DECIMAL_SCALE) {
+  return z
+    .string()
+    .regex(grammar(scale), `decimal inválido: esperado até ${scale} casas, sem notação científica`);
 }
 
 /** Converte para aritmética exata. Nunca passe por `Number`. */

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DecimalString } from '../decimal/decimal-string.js';
+import { DecimalString, DecimalStringOut } from '../decimal/decimal-string.js';
 import { AccuracyMetric, ModelPackage } from './scenarios.js';
 import { Paginated } from './common.js';
 
@@ -41,11 +41,11 @@ export const ForecastItemRow = z.object({
   year: z.int(),
   month: z.int().min(1).max(12),
   /** String decimal — nunca número JSON (Princípio V). */
-  quantity: DecimalString(),
+  quantity: DecimalStringOut(),
   /** Modelo vencedor para a série a que este item pertence. */
   winnerModel: z.string(),
   /** Erro do modelo vencedor no backtest (DecimalString, pode ser null). */
-  metricValue: DecimalString().nullable(),
+  metricValue: DecimalStringOut().nullable(),
 });
 
 export const ForecastItemsResponse = Paginated(ForecastItemRow);
@@ -57,7 +57,7 @@ export const ForecastSeriesRow = z.object({
   /** Valores dos rótulos de agrupamento, na ordem da parametrização. */
   segments: z.array(z.string()),
   winnerModel: z.string(),
-  metricValue: DecimalString().nullable(),
+  metricValue: DecimalStringOut().nullable(),
   excludedModels: z.array(z.string()),
 });
 
