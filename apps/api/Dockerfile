@@ -75,7 +75,7 @@ RUN addgroup --system --gid 1001 nodejs \
 
 COPY --from=pruner --chown=nodejs:nodejs /deploy              ./
 COPY                                     apps/api/docker-entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN sed -i 's/\r//' /entrypoint.sh && chmod +x /entrypoint.sh
 
 USER nodejs
 
