@@ -64,7 +64,10 @@ RUN pnpm --filter @sop/api build
 
 # ─── pruner: deployment autossuficiente ──────────────────────────
 FROM builder AS pruner
-RUN pnpm --filter @sop/api deploy --prod /deploy
+RUN pnpm --filter @sop/api deploy --prod /deploy \
+ && cp -r apps/api/dist   /deploy/dist \
+ && cp -r apps/api/prisma /deploy/prisma \
+ && cd /deploy && node_modules/.bin/prisma generate
 
 # ─── runner: imagem final mínima ─────────────────────────────────
 FROM node:${NODE_VERSION}-alpine AS runner

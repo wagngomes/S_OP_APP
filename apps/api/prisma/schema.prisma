@@ -24,10 +24,10 @@ datasource db {
 // ============================================================================
 
 model User {
-  id              String    @id @default(uuid()) @db.Uuid
+  id              String    @id
   email           String    @unique
   name            String?
-  emailVerifiedAt DateTime? @db.Timestamptz
+  emailVerified   Boolean   @default(false)
   createdAt       DateTime  @default(now()) @db.Timestamptz
   updatedAt       DateTime  @updatedAt @db.Timestamptz
 
@@ -45,13 +45,14 @@ model User {
 }
 
 model Session {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
+  id        String   @id
+  userId    String
   token     String   @unique
   expiresAt DateTime @db.Timestamptz
   ipAddress String?
   userAgent String?
   createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -60,10 +61,11 @@ model Session {
 }
 
 model Account {
-  id                   String    @id @default(uuid()) @db.Uuid
-  userId               String    @db.Uuid
+  id                   String    @id
+  userId               String
   accountId            String
   providerId           String
+  issuer               String?
   password             String?
   accessToken          String?
   refreshToken         String?
@@ -79,7 +81,7 @@ model Account {
 }
 
 model Verification {
-  id         String   @id @default(uuid()) @db.Uuid
+  id         String   @id
   identifier String
   value      String
   expiresAt  DateTime @db.Timestamptz
@@ -124,7 +126,7 @@ model Scenario {
   id                      String         @id @default(uuid()) @db.Uuid
   name                    String
   phase                   ScenarioPhase  @default(TEAM_SETUP)
-  createdById             String         @db.Uuid
+  createdById             String
   finalSayRole            FinalSayRole   @default(CREATOR)
   teamClosedAt            DateTime?      @db.Timestamptz
   forecastHorizonMonths   Int            @default(12)
@@ -156,7 +158,7 @@ model Scenario {
 model ScenarioMember {
   id                  String     @id @default(uuid()) @db.Uuid
   scenarioId          String     @db.Uuid
-  userId              String?    @db.Uuid
+  userId              String?
   invitedEmail        String
   role                MemberRole
   collaborationDoneAt DateTime?  @db.Timestamptz
@@ -222,7 +224,7 @@ model IngestionJob {
   invalidRows    Int           @default(0)
   issueCount     Int           @default(0)
   issueCapReached Boolean      @default(false)
-  uploadedById   String        @db.Uuid
+  uploadedById   String
   correlationId  String
   startedAt      DateTime?     @db.Timestamptz
   finishedAt     DateTime?     @db.Timestamptz
@@ -334,7 +336,7 @@ model ForecastJob {
   inputUri            String?
   outputUri           String?
   seriesOutputUri     String?
-  requestedById       String    @db.Uuid
+  requestedById       String
   correlationId       String
   startedAt           DateTime? @db.Timestamptz
   finishedAt          DateTime? @db.Timestamptz
@@ -411,7 +413,7 @@ model CollaborationAdjustment {
   id             String           @id @default(uuid()) @db.Uuid
   scenarioId     String           @db.Uuid
   forecastItemId String           @db.Uuid
-  authorId       String           @db.Uuid
+  authorId       String
   quantity       Decimal          @db.Decimal(18, 6)
   reason         String
   origin         AdjustmentOrigin
@@ -432,7 +434,7 @@ model CollaborationAdjustment {
 model ConsensusDecision {
   id                   String          @id @default(uuid()) @db.Uuid
   forecastItemId       String          @unique @db.Uuid
-  decidedById          String          @db.Uuid
+  decidedById          String
   source               ConsensusSource
   quantity             Decimal         @db.Decimal(18, 6)
   reason               String?
@@ -540,7 +542,7 @@ model AuditEvent {
   entityType    String
   entityId      String      @db.Uuid
   action        AuditAction
-  actorId       String?     @db.Uuid
+  actorId       String?
   origin        AuditOrigin
   occurredAt    DateTime    @default(now()) @db.Timestamptz
   correlationId String

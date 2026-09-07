@@ -18,9 +18,9 @@ export type InviteMemberBody = z.infer<typeof InviteMemberBody>;
 export const ScenarioMember = z.object({
   id: z.uuid(),
   scenarioId: z.uuid(),
-  invitedEmail: z.string().email(),
+  invitedEmail: z.string(),
   role: MemberRoleSchema,
-  userId: z.string().uuid().nullable(),
+  userId: z.string().nullable(),
   collaborationDoneAt: z.iso.datetime().nullable(),
   createdAt: z.iso.datetime(),
 });

@@ -51,7 +51,7 @@ CREATE TYPE "EmailStatus" AS ENUM ('PENDING', 'SENT', 'FAILED');
 
 -- CreateTable
 CREATE TABLE "users" (
-    "id" UUID NOT NULL,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT,
     "emailVerifiedAt" TIMESTAMPTZ,
@@ -63,23 +63,25 @@ CREATE TABLE "users" (
 
 -- CreateTable
 CREATE TABLE "sessions" (
-    "id" UUID NOT NULL,
-    "userId" UUID NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "expiresAt" TIMESTAMPTZ NOT NULL,
     "ipAddress" TEXT,
     "userAgent" TEXT,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ NOT NULL,
 
     CONSTRAINT "sessions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "accounts" (
-    "id" UUID NOT NULL,
-    "userId" UUID NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "accountId" TEXT NOT NULL,
     "providerId" TEXT NOT NULL,
+    "issuer" TEXT,
     "password" TEXT,
     "accessToken" TEXT,
     "refreshToken" TEXT,
@@ -92,7 +94,7 @@ CREATE TABLE "accounts" (
 
 -- CreateTable
 CREATE TABLE "verifications" (
-    "id" UUID NOT NULL,
+    "id" TEXT NOT NULL,
     "identifier" TEXT NOT NULL,
     "value" TEXT NOT NULL,
     "expiresAt" TIMESTAMPTZ NOT NULL,
@@ -106,7 +108,7 @@ CREATE TABLE "scenarios" (
     "id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "phase" "ScenarioPhase" NOT NULL DEFAULT 'TEAM_SETUP',
-    "createdById" UUID NOT NULL,
+    "createdById" TEXT NOT NULL,
     "finalSayRole" "FinalSayRole" NOT NULL DEFAULT 'CREATOR',
     "teamClosedAt" TIMESTAMPTZ,
     "forecastHorizonMonths" INTEGER NOT NULL DEFAULT 12,
@@ -123,7 +125,7 @@ CREATE TABLE "scenarios" (
 CREATE TABLE "scenario_members" (
     "id" UUID NOT NULL,
     "scenarioId" UUID NOT NULL,
-    "userId" UUID,
+    "userId" TEXT,
     "invitedEmail" TEXT NOT NULL,
     "role" "MemberRole" NOT NULL,
     "collaborationDoneAt" TIMESTAMPTZ,
@@ -155,7 +157,7 @@ CREATE TABLE "ingestion_jobs" (
     "invalidRows" INTEGER NOT NULL DEFAULT 0,
     "issueCount" INTEGER NOT NULL DEFAULT 0,
     "issueCapReached" BOOLEAN NOT NULL DEFAULT false,
-    "uploadedById" UUID NOT NULL,
+    "uploadedById" TEXT NOT NULL,
     "correlationId" TEXT NOT NULL,
     "startedAt" TIMESTAMPTZ,
     "finishedAt" TIMESTAMPTZ,
@@ -229,7 +231,7 @@ CREATE TABLE "forecast_jobs" (
     "seriesCount" INTEGER NOT NULL DEFAULT 0,
     "inputUri" TEXT,
     "outputUri" TEXT,
-    "requestedById" UUID NOT NULL,
+    "requestedById" TEXT NOT NULL,
     "correlationId" TEXT NOT NULL,
     "startedAt" TIMESTAMPTZ,
     "finishedAt" TIMESTAMPTZ,
@@ -275,7 +277,7 @@ CREATE TABLE "collaboration_adjustments" (
     "id" UUID NOT NULL,
     "scenarioId" UUID NOT NULL,
     "forecastItemId" UUID NOT NULL,
-    "authorId" UUID NOT NULL,
+    "authorId" TEXT NOT NULL,
     "quantity" DECIMAL(18,6) NOT NULL,
     "reason" TEXT NOT NULL,
     "origin" "AdjustmentOrigin" NOT NULL,
@@ -289,7 +291,7 @@ CREATE TABLE "collaboration_adjustments" (
 CREATE TABLE "consensus_decisions" (
     "id" UUID NOT NULL,
     "forecastItemId" UUID NOT NULL,
-    "decidedById" UUID NOT NULL,
+    "decidedById" TEXT NOT NULL,
     "source" "ConsensusSource" NOT NULL,
     "quantity" DECIMAL(18,6) NOT NULL,
     "reason" TEXT,
@@ -352,7 +354,7 @@ CREATE TABLE "audit_events" (
     "entityType" TEXT NOT NULL,
     "entityId" UUID NOT NULL,
     "action" "AuditAction" NOT NULL,
-    "actorId" UUID,
+    "actorId" TEXT,
     "origin" "AuditOrigin" NOT NULL,
     "occurredAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "correlationId" TEXT NOT NULL,

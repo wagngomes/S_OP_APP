@@ -5,6 +5,7 @@ import type {
   ScenarioRecord,
   ScenarioRepository,
   SegmentationLevelRecord,
+  ToleranceUpdate,
 } from '../../composition/ports.js';
 
 function toRecord(s: {
@@ -15,6 +16,8 @@ function toRecord(s: {
   finalSayRole: string;
   teamClosedAt: Date | null;
   forecastHorizonMonths: number;
+  consensusToleranceValue: { toFixed: (n: number) => string } | null;
+  consensusToleranceKind: string | null;
   publishedAt: Date | null;
   createdAt: Date;
 }): ScenarioRecord {
@@ -26,6 +29,8 @@ function toRecord(s: {
     finalSayRole: s.finalSayRole as ScenarioRecord['finalSayRole'],
     teamClosedAt: s.teamClosedAt?.toISOString() ?? null,
     forecastHorizonMonths: s.forecastHorizonMonths,
+    consensusToleranceValue: s.consensusToleranceValue?.toFixed(6) ?? null,
+    consensusToleranceKind: s.consensusToleranceKind as ScenarioRecord['consensusToleranceKind'],
     publishedAt: s.publishedAt?.toISOString() ?? null,
     createdAt: s.createdAt.toISOString(),
   };
@@ -40,16 +45,19 @@ export class PrismaScenarioRepository implements ScenarioRepository {
     finalSayRole: 'CREATOR' | 'APPROVER';
     forecastHorizonMonths: number;
   }): Promise<ScenarioRecord> {
+    const creator = await this.prisma.user.findUnique({
+      where: { id: input.createdById },
+      select: { email: true },
+    });
     const s = await this.prisma.scenario.create({
       data: {
         name: input.name,
         createdById: input.createdById,
         finalSayRole: input.finalSayRole,
         forecastHorizonMonths: input.forecastHorizonMonths,
-        // Cria o creator como membro inicial
         members: {
           create: {
-            invitedEmail: '', // preenchido no sign-up; creator já tem conta
+            invitedEmail: creator?.email ?? '',
             role: 'CREATOR',
             userId: input.createdById,
           },
@@ -190,6 +198,23 @@ export class PrismaScenarioRepository implements ScenarioRepository {
     await this.prisma.scenario.update({
       where: { id: scenarioId },
       data: { teamClosedAt: new Date() },
+    });
+  }
+
+  async setTolerance(scenarioId: string, tolerance: ToleranceUpdate | null): Promise<void> {
+    await this.prisma.scenario.update({
+      where: { id: scenarioId },
+      data: {
+        consensusToleranceValue: tolerance?.value ?? null,
+        consensusToleranceKind: tolerance?.kind ?? null,
+      },
+    });
+  }
+
+  async setPublishedAt(scenarioId: string): Promise<void> {
+    await this.prisma.scenario.update({
+      where: { id: scenarioId },
+      data: { publishedAt: new Date() },
     });
   }
 }

@@ -145,7 +145,6 @@ class ForecastConsumer:
 
         from forecast_engine.application.batching import run_forecast_in_batches
         from forecast_engine.application.forecast_job import ForecastParams
-        from forecast_engine.domain.model_catalog import ModelPackage
         from forecast_engine.adapters.observability import jobs_total, job_duration_seconds, rows_processed_total
 
         rows = self._reader.read(input_uri)
@@ -161,7 +160,7 @@ class ForecastConsumer:
             proration_months=int(params_raw.get("prorationMonths", 12)),
             horizon_months=int(params_raw.get("horizonMonths", 12)),
             metric=str(params_raw.get("accuracyMetric", "WMAPE")),
-            package=ModelPackage(str(params_raw.get("modelPackage", "FAST"))),
+            package=str(params_raw.get("modelPackage", "FAST")),  # type: ignore[arg-type]
             scale=int(params_raw.get("decimalScale", 6)),
         )
 

@@ -2,6 +2,7 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { fromNodeHeaders } from 'better-auth/node';
 import type { PrismaClient } from '@prisma/client';
+import { randomUUID } from 'node:crypto';
 import type { AuthPort, AuthedUser, Authenticator } from '../../composition/ports.js';
 
 /**
@@ -21,6 +22,7 @@ export function createAuth(prisma: PrismaClient) {
     advanced: {
       cookiePrefix: 'sop',
       useSecureCookies: process.env.NODE_ENV !== 'development',
+      generateId: () => randomUUID(),
     },
   });
 }

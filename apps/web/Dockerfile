@@ -58,14 +58,15 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 --ingroup nodejs nodejs
 
-# O standalone já embute o servidor e um node_modules mínimo
+# O standalone já embute o servidor e um node_modules mínimo.
+# Em monorepo, server.js faz chdir para __dirname (/app/apps/web),
+# então static e public devem ficar relativos a esse mesmo diretório.
 COPY --from=builder --chown=nodejs:nodejs \
      /workspace/apps/web/.next/standalone ./
 COPY --from=builder --chown=nodejs:nodejs \
-     /workspace/apps/web/.next/static     ./.next/static
-# public/ pode não existir ainda — ignorar falha
+     /workspace/apps/web/.next/static     ./apps/web/.next/static
 COPY --from=builder --chown=nodejs:nodejs \
-     /workspace/apps/web/public           ./public
+     /workspace/apps/web/public           ./apps/web/public
 
 USER nodejs
 
@@ -76,4 +77,4 @@ ENV NODE_ENV=production \
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["node", "apps/web/server.js"]

@@ -52,5 +52,4 @@ ENV PATH="/opt/venv/bin:$PATH" \
 
 EXPOSE 9102
 
-# T058 — main.py implementado quando a camada de mensageria estiver pronta
-CMD ["python", "-m", "forecast_engine.application.main"]
+CMD ["python", "-m", "forecast_engine.main"]

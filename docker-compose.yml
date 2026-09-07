@@ -83,7 +83,7 @@ services:
     ports:
       - "${PROMETHEUS_PORT:-9090}:9090"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/healthy"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9090/-/healthy"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -99,7 +99,7 @@ services:
     ports:
       - "${LOKI_PORT:-3100}:3100"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3100/ready"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3100/ready"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -124,7 +124,7 @@ services:
       loki:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -139,6 +139,7 @@ services:
       dockerfile: apps/api/Dockerfile
     restart: unless-stopped
     environment:
+      NODE_ENV: development
       API_PORT: 3001
       DATABASE_URL: postgresql://${POSTGRES_USER:-sop}:${POSTGRES_PASSWORD:-troque-em-producao}@postgres:5432/${POSTGRES_DB:-sop}?schema=public
       AMQP_URL: amqp://${RABBITMQ_DEFAULT_USER:-sop}:${RABBITMQ_DEFAULT_PASS:-troque-em-producao}@rabbitmq:5672
@@ -147,8 +148,8 @@ services:
       S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-troque-em-producao}
       S3_BUCKET: ${MINIO_BUCKET:-sop}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-gere-um-segredo-de-32-bytes}
-      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3001}
-      TRUSTED_ORIGINS: ${TRUSTED_ORIGINS:-http://localhost:3000}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://127.0.0.1:3001}
+      TRUSTED_ORIGINS: ${TRUSTED_ORIGINS:-http://127.0.0.1:3000}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-300}
       RATE_LIMIT_WINDOW: ${RATE_LIMIT_WINDOW:-1 minute}
@@ -163,11 +164,11 @@ services:
       minio:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health"]
-      interval: 10s
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/api/health"]
+      interval: 15s
       timeout: 5s
-      retries: 10
-      start_period: 30s
+      retries: 12
+      start_period: 60s
     mem_limit: 2g
 
   ingestion-worker:
@@ -217,17 +218,17 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+        NEXT_PUBLIC_API_URL: ""
     restart: unless-stopped
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      API_INTERNAL_URL: http://api:3001
     ports:
       - "${WEB_PORT:-3000}:3000"
     depends_on:
       api:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/"]
       interval: 10s
       timeout: 5s
       retries: 5

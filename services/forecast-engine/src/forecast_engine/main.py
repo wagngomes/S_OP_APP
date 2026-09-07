@@ -25,6 +25,32 @@ from forecast_engine.application.warmup import warmup_models
 from forecast_engine.messaging.forecast_consumer import ForecastConsumer
 
 
+def _declare_topology(channel: "pika.adapters.blocking_connection.BlockingChannel") -> None:
+    """Declara exchanges e filas idempotentemente antes de consumir.
+
+    Espelha assertTopology() do Node (apps/api/src/adapters/rabbitmq/topology.ts).
+    Ambos os lados declaram a mesma topologia; o RabbitMQ aceita re-declarações
+    idempotentes enquanto os parâmetros forem idênticos.
+    """
+    dlx = "sop.dlx"
+    exchange = "sop.forecast"
+    request_q = "sop.forecast.request.v1"
+    result_q = "sop.forecast.result.v1"
+
+    channel.exchange_declare(dlx, exchange_type="direct", durable=True)
+    channel.exchange_declare(exchange, exchange_type="direct", durable=True)
+
+    for q in (request_q, result_q):
+        dlq = f"{q}.dlq"
+        channel.queue_declare(dlq, durable=True)
+        channel.queue_bind(dlq, dlx, routing_key=q)
+        channel.queue_declare(q, durable=True, arguments={
+            "x-dead-letter-exchange": dlx,
+            "x-dead-letter-routing-key": q,
+        })
+        channel.queue_bind(q, exchange, routing_key=q)
+
+
 def main() -> None:
     configure_logging()
     configure_metrics()
@@ -45,6 +71,9 @@ def main() -> None:
     amqp_url = os.environ.get("AMQP_URL", "amqp://guest:guest@localhost:5672/")
     connection = pika.BlockingConnection(pika.URLParameters(amqp_url))
     channel = connection.channel()
+
+    # Declara topologia antes de consumir — idempotente, espelha o Node
+    _declare_topology(channel)
 
     # Warm-up antes de registrar consumidor (D18)
     warmup_models()
