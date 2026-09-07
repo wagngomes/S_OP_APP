@@ -29,6 +29,9 @@ COPY apps/web/package.json             apps/web/
 COPY apps/api/prisma                   apps/api/prisma
 
 RUN pnpm install --frozen-lockfile
+# Garante que o Prisma Client é gerado com o schema correto antes da compilação.
+# O postinstall do @prisma/client pode não encontrar o schema no contexto pnpm.
+RUN pnpm --filter @sop/api exec prisma generate
 
 # ─── builder: compilar TypeScript ────────────────────────────────
 FROM deps AS builder
