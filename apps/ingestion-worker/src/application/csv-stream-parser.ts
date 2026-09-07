@@ -107,11 +107,11 @@ export async function parseCsvStream(
         return;
       }
 
-      const productCode = record[0].trim();
+      const productCode = (record[0] ?? '').trim();
       const segments = record.slice(1, 1 + declaredLabels.length).map((s) => s.trim());
-      const yearRaw = record[1 + declaredLabels.length].trim();
-      const monthRaw = record[2 + declaredLabels.length].trim();
-      const quantityRaw = record[3 + declaredLabels.length].trim();
+      const yearRaw = (record[1 + declaredLabels.length] ?? '').trim();
+      const monthRaw = (record[2 + declaredLabels.length] ?? '').trim();
+      const quantityRaw = (record[3 + declaredLabels.length] ?? '').trim();
 
       const rowErrors: ParseError[] = [];
 

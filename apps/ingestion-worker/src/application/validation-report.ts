@@ -60,7 +60,7 @@ export function buildValidationReport(
     }
     issues.push({
       lineNumber: err.lineNumber,
-      column: err.column,
+      ...(err.column !== undefined ? { column: err.column } : {}),
       code: err.code,
       detail: err.detail,
     });
