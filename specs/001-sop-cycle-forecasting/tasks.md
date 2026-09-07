@@ -207,9 +207,9 @@ previsão consistente, sem nenhuma das outras histórias.
 
 - [X] T110 [P] [US1] Implementar as telas de cadastro e login em apps/web/src/app/(auth)/
 - [X] T111 [P] [US1] Implementar a tela de criação e listagem de cenários em apps/web/src/app/scenarios/
-- [ ] T112 [US1] Implementar a tela de upload com acompanhamento por polling e exibição do relatório de linhas inválidas em apps/web/src/app/scenarios/[id]/upload/
-- [ ] T113 [US1] Implementar o campo de arrastar níveis, o seletor de pacote e a exibição de `seriesCount` e tempo estimado em apps/web/src/app/scenarios/[id]/parameters/ (FR-032, FR-034a)
-- [ ] T114 [US1] Implementar a tela de resultado com previsão por item, modelo vencedor e erro, formatando strings decimais sem recalcular nada em apps/web/src/app/scenarios/[id]/forecast/ (Princípio II)
+- [X] T112 [US1] Implementar a tela de upload com acompanhamento por polling e exibição do relatório de linhas inválidas em apps/web/src/app/scenarios/[id]/upload/
+- [X] T113 [US1] Implementar o campo de arrastar níveis, o seletor de pacote e a exibição de `seriesCount` e tempo estimado em apps/web/src/app/scenarios/[id]/parameters/ (FR-032, FR-034a)
+- [X] T114 [US1] Implementar a tela de resultado com previsão por item, modelo vencedor e erro, formatando strings decimais sem recalcular nada em apps/web/src/app/scenarios/[id]/forecast/ (Princípio II)
 
 **Checkpoint**: US1 funcional e testável isoladamente — este é o MVP
 

@@ -71,7 +71,7 @@ export default function TeamPage() {
     setClosing(true);
     try {
       await closeTeam(id);
-      router.push(`/scenarios/${id}`);
+      router.push('/scenarios');
     } catch (err) {
       setCloseError(err instanceof Error ? err.message : 'Erro ao fechar equipe');
     } finally {

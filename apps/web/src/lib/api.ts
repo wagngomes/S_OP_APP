@@ -5,7 +5,9 @@
  * módulo não faz nenhuma conversão: devolve o JSON como veio.
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+// Empty string → relative URLs → same-origin → Next.js proxies to API via rewrites.
+// NEXT_PUBLIC_API_URL kept for external deployments where proxy isn't in place.
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 type ApiOptions = Omit<RequestInit, 'body'> & { body?: unknown };
 
@@ -24,9 +26,10 @@ async function request<T>(path: string, options: ApiOptions = {}): Promise<T> {
   }
   const res = await fetch(`${BASE_URL}${path}`, init);
 
-  const data = await res.json();
+  const contentType = res.headers.get('content-type') ?? '';
+  const data = contentType.includes('application/json') ? await res.json() : null;
   if (!res.ok) {
-    const msg = data?.error?.message ?? `HTTP ${res.status}`;
+    const msg = (data as { error?: { message?: string } } | null)?.error?.message ?? `HTTP ${res.status}`;
     throw new Error(msg);
   }
   return data as T;
@@ -90,6 +93,15 @@ export async function createScenario(body: {
   return request('/api/v1/scenarios', { method: 'POST', body });
 }
 
+export type ScenarioDetail = ScenarioSummary & {
+  forecastHorizonMonths: number;
+  availableActions: string[];
+};
+
+export async function getScenario(id: string): Promise<ScenarioDetail> {
+  return request(`/api/v1/scenarios/${id}`);
+}
+
 // --- Membros -----------------------------------------------------------------
 
 export type MemberRole = 'CREATOR' | 'APPROVER' | 'COLLABORATOR';
@@ -126,4 +138,164 @@ export async function submitApprovalDecision(
   body: { decision: 'APPROVE' | 'RETURN'; reason?: string | undefined },
 ): Promise<void> {
   await request(`/api/v1/scenarios/${scenarioId}/approval-decision`, { method: 'POST', body });
+}
+
+// --- Upload e ingestão -------------------------------------------------------
+
+export type IngestionJobStatus = {
+  id: string;
+  kind: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  totalRows: number;
+  validRows: number;
+  invalidRows: number;
+  issueCount: number;
+  issueCapReached: boolean;
+  createdAt: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  failureReason: string | null;
+};
+
+export type IngestionIssueItem = {
+  id: string;
+  lineNumber: number;
+  column: string | null;
+  code: string;
+  detail: string;
+};
+
+export async function uploadDataset(
+  scenarioId: string,
+  file: File,
+  declaredLabels: string[],
+): Promise<{ jobId: string }> {
+  const form = new FormData();
+  form.append('kind', 'SALES_HISTORY');
+  form.append('declaredLabels', declaredLabels.join(';'));
+  form.append('file', file);
+  const res = await fetch(`${BASE_URL}/api/v1/scenarios/${scenarioId}/uploads`, {
+    method: 'POST',
+    credentials: 'include',
+    body: form,
+  });
+  const contentType = res.headers.get('content-type') ?? '';
+  const data = contentType.includes('application/json') ? await res.json() : null;
+  if (!res.ok) {
+    const msg = (data as { error?: { message?: string } } | null)?.error?.message ?? `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  return data as { jobId: string };
+}
+
+export async function getIngestionJob(jobId: string): Promise<IngestionJobStatus> {
+  return request(`/api/v1/ingestion-jobs/${jobId}`);
+}
+
+export async function listIngestionIssues(
+  jobId: string,
+  page?: { limit?: number; offset?: number },
+): Promise<{ data: IngestionIssueItem[]; total: number; limit: number; offset: number }> {
+  const params = new URLSearchParams();
+  if (page?.limit) params.set('limit', String(page.limit));
+  if (page?.offset) params.set('offset', String(page.offset));
+  const qs = params.size > 0 ? `?${params}` : '';
+  return request(`/api/v1/ingestion-jobs/${jobId}/issues${qs}`);
+}
+
+// --- Parametrização ----------------------------------------------------------
+
+export type SegmentationLevel = { id: string; position: number; label: string };
+
+export type ModelPackageInfo = {
+  id: 'FAST' | 'STANDARD' | 'COMPLETE';
+  label: string;
+  models: string[];
+  backtestWindows: number;
+  tradeoff: string;
+};
+
+export type SeriesPreview = {
+  seriesCount: number;
+  estimatedDurationSeconds: number;
+  magnitude: 'SECONDS' | 'MINUTES' | 'TENS_OF_MINUTES' | 'HOURS';
+  modelsEvaluated: number;
+  backtestWindows: number;
+};
+
+export type ParametersBody = {
+  groupingLevelIds: string[];
+  prorationMonths: number;
+  accuracyMetric: 'WMAPE' | 'MAPE' | 'BIAS';
+  modelPackage: 'FAST' | 'STANDARD' | 'COMPLETE';
+  horizonMonths: number;
+};
+
+export async function getLevels(scenarioId: string): Promise<{ data: SegmentationLevel[] }> {
+  return request(`/api/v1/scenarios/${scenarioId}/levels`);
+}
+
+export async function getModelPackages(): Promise<{ data: ModelPackageInfo[] }> {
+  return request('/api/v1/model-packages');
+}
+
+export async function getSeriesPreview(
+  scenarioId: string,
+  levelIds: string[],
+  pkg: 'FAST' | 'STANDARD' | 'COMPLETE',
+): Promise<SeriesPreview> {
+  const qs = new URLSearchParams({ levelIds: levelIds.join(','), package: pkg });
+  return request(`/api/v1/scenarios/${scenarioId}/series-preview?${qs}`);
+}
+
+export async function saveParameters(
+  scenarioId: string,
+  body: ParametersBody,
+): Promise<ParametersBody & { prorationRequired: boolean; zeroHeavyWarning: boolean }> {
+  return request(`/api/v1/scenarios/${scenarioId}/parameters`, { method: 'PUT', body });
+}
+
+// --- Cálculo de previsão -----------------------------------------------------
+
+export type ForecastJobStatus = {
+  id: string;
+  scenarioId: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  horizonMonths: number;
+  accuracyMetric: string;
+  modelPackage: string;
+  createdAt: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  failureReason: string | null;
+};
+
+export type ForecastItemRow = {
+  id: string;
+  productCode: string;
+  segments: string[];
+  year: number;
+  month: number;
+  quantity: string;
+  winnerModel: string;
+  metricValue: string | null;
+};
+
+export async function triggerForecast(scenarioId: string): Promise<{ jobId: string }> {
+  return request(`/api/v1/scenarios/${scenarioId}/forecast-jobs`, { method: 'POST' });
+}
+
+export async function getForecastJob(scenarioId: string, jobId: string): Promise<ForecastJobStatus> {
+  return request(`/api/v1/scenarios/${scenarioId}/forecast-jobs/${jobId}`);
+}
+
+export async function listForecastItems(
+  scenarioId: string,
+  page?: { limit?: number; offset?: number },
+): Promise<{ data: ForecastItemRow[]; total: number; limit: number; offset: number }> {
+  const params = new URLSearchParams();
+  if (page?.limit) params.set('limit', String(page.limit));
+  if (page?.offset) params.set('offset', String(page.offset));
+  const qs = params.size > 0 ? `?${params}` : '';
+  return request(`/api/v1/scenarios/${scenarioId}/forecast-items${qs}`);
 }
