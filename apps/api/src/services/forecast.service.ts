@@ -62,6 +62,7 @@ export class ForecastService {
       accuracyMetric: params.accuracyMetric,
       modelPackage: params.modelPackage,
       correlationId,
+      requestedById: userId,
     });
 
     const levels = await this.scenarios.listLevels(scenario.id);

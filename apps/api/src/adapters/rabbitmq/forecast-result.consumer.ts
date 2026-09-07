@@ -2,6 +2,8 @@ import { ForecastResultPayload } from '@sop/contracts';
 import type {
   ForecastItemRepository,
   ForecastRepository,
+  MembershipRepository,
+  NotificationPort,
   ParquetReader,
   ScenarioRepository,
 } from '../../composition/ports.js';
@@ -24,6 +26,8 @@ export class ForecastResultConsumer {
     private readonly items: ForecastItemRepository,
     private readonly parquet: ParquetReader,
     private readonly scenarios: ScenarioRepository,
+    private readonly membership?: MembershipRepository,
+    private readonly notification?: NotificationPort,
   ) {}
 
   async process(rawPayload: unknown): Promise<void> {
@@ -51,6 +55,25 @@ export class ForecastResultConsumer {
 
       // Avança a fase: CALCULATION → APPROVAL
       await this.scenarios.transitionPhase(job.scenarioId, 'CALCULATION', 'APPROVAL');
+
+      // FR-053 — notifica aprovadores quando o cálculo termina
+      if (this.membership && this.notification) {
+        const scenario = await this.scenarios.findById(job.scenarioId);
+        if (scenario) {
+          const members = await this.membership.listMembers(job.scenarioId);
+          const approverEmails = members
+            .filter((m) => m.role === 'APPROVER')
+            .map((m) => m.invitedEmail);
+          if (approverEmails.length > 0) {
+            await this.notification.notifyForecastReady({
+              scenarioId: job.scenarioId,
+              scenarioName: scenario.name,
+              approverEmails,
+              correlationId: payload.jobId,
+            });
+          }
+        }
+      }
     } else {
       await this.forecast.updateResult(payload.jobId, {
         status: 'FAILED',

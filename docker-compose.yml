@@ -148,6 +148,7 @@ services:
       S3_BUCKET: ${MINIO_BUCKET:-sop}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-gere-um-segredo-de-32-bytes}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3001}
+      TRUSTED_ORIGINS: ${TRUSTED_ORIGINS:-http://localhost:3000}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-300}
       RATE_LIMIT_WINDOW: ${RATE_LIMIT_WINDOW:-1 minute}
@@ -215,9 +216,11 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
     restart: unless-stopped
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/api/v1}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
     ports:
       - "${WEB_PORT:-3000}:3000"
     depends_on:

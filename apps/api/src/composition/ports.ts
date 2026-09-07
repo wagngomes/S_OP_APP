@@ -1,4 +1,6 @@
 import type { FastifyServerOptions } from 'fastify';
+import type { MemberRole } from '@sop/domain';
+export type { MemberRole };
 
 /**
  * Portas da API (Princípio IV).
@@ -136,6 +138,48 @@ export type ScenarioRepository = {
     from: ScenarioRecord['phase'],
     to: ScenarioRecord['phase'],
   ): Promise<void>;
+
+  /** FR-013 — marca a equipe como fechada. */
+  setTeamClosed(scenarioId: string): Promise<void>;
+};
+
+// --- Membros -----------------------------------------------------------------
+
+export type ScenarioMemberRecord = {
+  id: string;
+  scenarioId: string;
+  userId: string | null;
+  invitedEmail: string;
+  role: MemberRole;
+  collaborationDoneAt: string | null;
+  createdAt: string;
+};
+
+export type MembershipRepository = {
+  /** FR-009 — convida por e-mail; vínculo de conta ocorre depois do cadastro. */
+  invite(input: {
+    scenarioId: string;
+    invitedEmail: string;
+    role: MemberRole;
+  }): Promise<ScenarioMemberRecord>;
+
+  listMembers(scenarioId: string): Promise<ScenarioMemberRecord[]>;
+
+  getRolesForUser(scenarioId: string, userId: string): Promise<MemberRole[]>;
+
+  hasApprover(scenarioId: string): Promise<boolean>;
+};
+
+// --- Notificação -------------------------------------------------------------
+
+export type NotificationPort = {
+  /** FR-053 — notifica aprovadores quando o cálculo termina. */
+  notifyForecastReady(input: {
+    scenarioId: string;
+    scenarioName: string;
+    approverEmails: string[];
+    correlationId: string;
+  }): Promise<void>;
 };
 
 // --- Ingestão -----------------------------------------------------------------
@@ -215,6 +259,8 @@ export type ForecastRepository = {
     accuracyMetric: string;
     modelPackage: string;
     correlationId: string;
+    /** Quem solicitou o cálculo — obrigatório no Prisma, opcional para fakes. */
+    requestedById?: string;
   }): Promise<ForecastJobRecord>;
 
   /** FR-051 — retorna o job ativo (PENDING ou PROCESSING) se existir. */
@@ -294,6 +340,8 @@ export type AppDependencies = {
   datasets?: DatasetStore;
   datasetExporter?: DatasetExporter;
   parquet?: ParquetReader;
+  membership?: MembershipRepository;
+  notification?: NotificationPort;
   /** Sobrescreve o logger — usado nos testes para capturar o que foi emitido. */
   logger?: FastifyServerOptions['logger'];
 };

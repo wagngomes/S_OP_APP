@@ -333,6 +333,7 @@ model ForecastJob {
   seriesCount         Int       @default(0)
   inputUri            String?
   outputUri           String?
+  seriesOutputUri     String?
   requestedById       String    @db.Uuid
   correlationId       String
   startedAt           DateTime? @db.Timestamptz

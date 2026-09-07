@@ -5,7 +5,7 @@
  * módulo não faz nenhuma conversão: devolve o JSON como veio.
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3333';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 type ApiOptions = Omit<RequestInit, 'body'> & { body?: unknown };
 
@@ -88,4 +88,42 @@ export async function createScenario(body: {
   forecastHorizonMonths?: number;
 }): Promise<ScenarioSummary> {
   return request('/api/v1/scenarios', { method: 'POST', body });
+}
+
+// --- Membros -----------------------------------------------------------------
+
+export type MemberRole = 'CREATOR' | 'APPROVER' | 'COLLABORATOR';
+
+export type ScenarioMember = {
+  id: string;
+  scenarioId: string;
+  invitedEmail: string;
+  role: MemberRole;
+  userId: string | null;
+  collaborationDoneAt: string | null;
+  createdAt: string;
+};
+
+export async function listMembers(scenarioId: string): Promise<{ data: ScenarioMember[] }> {
+  return request(`/api/v1/scenarios/${scenarioId}/members`);
+}
+
+export async function inviteMember(
+  scenarioId: string,
+  body: { email: string; role: 'APPROVER' | 'COLLABORATOR' },
+): Promise<ScenarioMember> {
+  return request(`/api/v1/scenarios/${scenarioId}/members`, { method: 'POST', body });
+}
+
+export async function closeTeam(scenarioId: string): Promise<void> {
+  await request(`/api/v1/scenarios/${scenarioId}/close-team`, { method: 'POST' });
+}
+
+// --- Aprovação ---------------------------------------------------------------
+
+export async function submitApprovalDecision(
+  scenarioId: string,
+  body: { decision: 'APPROVE' | 'RETURN'; reason?: string | undefined },
+): Promise<void> {
+  await request(`/api/v1/scenarios/${scenarioId}/approval-decision`, { method: 'POST', body });
 }

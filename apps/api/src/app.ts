@@ -17,8 +17,10 @@ import { loggerOptions } from './observability/logger.js';
 import { createMetrics, registerMetrics } from './observability/metrics.js';
 import { registerHealthRoutes } from './routes/health.js';
 import { registerAuthRoutes } from './routes/v1/auth.routes.js';
+import { registerApprovalRoutes } from './routes/v1/approval.routes.js';
 import { registerForecastRoutes } from './routes/v1/forecast.routes.js';
 import { registerIngestionRoutes } from './routes/v1/ingestion.routes.js';
+import { registerMemberRoutes } from './routes/v1/members.routes.js';
 import { registerScenarioRoutes } from './routes/v1/scenarios.routes.js';
 import { registerUploadRoutes } from './routes/v1/upload.routes.js';
 
@@ -46,6 +48,23 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
 
   registerCorrelation(app);
   registerErrorHandler(app);
+
+  // CORS — preflight (OPTIONS) e headers nas respostas normais
+  app.addHook('onRequest', async (request, reply) => {
+    if (request.method !== 'OPTIONS') return;
+    reply.header('Access-Control-Allow-Origin', request.headers.origin ?? '*');
+    reply.header('Access-Control-Allow-Credentials', 'true');
+    reply.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    reply.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Cookie');
+    reply.header('Access-Control-Max-Age', '86400');
+    await reply.status(204).send();
+  });
+  app.addHook('onSend', async (request, reply) => {
+    const origin = request.headers.origin;
+    if (!origin) return;
+    reply.header('Access-Control-Allow-Origin', origin);
+    reply.header('Access-Control-Allow-Credentials', 'true');
+  });
 
   await app.register(import('@fastify/multipart'), {
     limits: { fileSize: 500 * 1024 * 1024 },
@@ -105,6 +124,18 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
           scenarios: deps.scenarios,
           publisher: deps.publisher,
           exporter: deps.datasetExporter,
+        });
+      }
+      if (deps.auth && deps.scenarios && deps.membership) {
+        registerMemberRoutes(instance, {
+          auth: deps.auth,
+          scenarios: deps.scenarios,
+          membership: deps.membership,
+        });
+        registerApprovalRoutes(instance, {
+          auth: deps.auth,
+          scenarios: deps.scenarios,
+          membership: deps.membership,
         });
       }
     },

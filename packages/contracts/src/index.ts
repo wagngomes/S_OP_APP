@@ -82,3 +82,11 @@ export {
   ForecastSeriesResponse,
   ForecastSeriesRow,
 } from './http/forecast.js';
+
+export {
+  ApprovalDecisionBody,
+  InviteMemberBody,
+  MemberRoleSchema,
+  MembersResponse,
+  ScenarioMember,
+} from './http/members.js';

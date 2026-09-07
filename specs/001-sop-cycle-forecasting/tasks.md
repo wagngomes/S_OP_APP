@@ -226,21 +226,21 @@ equipe, verificar o aviso ao aprovador e que a colaboração só abre após a ap
 ### Tests for User Story 2
 
 - [X] T115 [P] [US2] Teste unitário da matriz papel × fase × ação em packages/domain/tests/scenario/authorization.test.ts (D8)
-- [ ] T116 [P] [US2] Teste de integração do fechamento de equipe sem aprovador respondendo 409 em apps/api/tests/integration/close-team-failures.test.ts (FR-015)
-- [ ] T117 [P] [US2] Teste de integração provando que colaborador não altera número antes da aprovação em apps/api/tests/integration/approval-gate.test.ts
-- [ ] T118 [P] [US2] Teste de contrato das rotas de membros e aprovação em apps/api/tests/contract/team-approval.contract.test.ts
+- [X] T116 [P] [US2] Teste de integração do fechamento de equipe sem aprovador respondendo 409 em apps/api/tests/integration/close-team-failures.test.ts (FR-015)
+- [X] T117 [P] [US2] Teste de integração provando que colaborador não altera número antes da aprovação em apps/api/tests/integration/approval-gate.test.ts
+- [X] T118 [P] [US2] Teste de contrato das rotas de membros e aprovação em apps/api/tests/contract/team-approval.contract.test.ts
 
 ### Implementation for User Story 2
 
 - [X] T119 [P] [US2] Implementar as regras de papel e a autorização por fase como funções puras em packages/domain/src/scenario/authorization.ts (D8)
 - [X] T120 [P] [US2] Implementar a regra de palavra final com default no criador em packages/domain/src/scenario/final-say.ts (FR-011, FR-012)
-- [ ] T121 [US2] Implementar convite de membros com vínculo por e-mail ainda sem conta em apps/api/src/services/membership.service.ts (FR-009, FR-018)
-- [ ] T122 [US2] Implementar as rotas de membros em apps/api/src/routes/v1/members.routes.ts
-- [ ] T123 [US2] Implementar o fechamento de equipe exigindo aprovador e travando a composição em apps/api/src/services/team.service.ts (FR-013, FR-014, FR-015)
-- [ ] T124 [US2] Implementar a rota de aprovação com decisão APPROVE e RETURN com motivo em apps/api/src/routes/v1/approval.routes.ts (FR-055, FR-056)
-- [ ] T125 [US2] Implementar a publicação do e-mail de previsão pronta ao aprovador ao concluir o cálculo em apps/api/src/services/forecast.service.ts (FR-053)
-- [ ] T126 [P] [US2] Implementar a tela de montagem de equipe e atribuição de papéis em apps/web/src/app/scenarios/[id]/team/
-- [ ] T127 [P] [US2] Implementar a tela de revisão e aprovação da previsão em apps/web/src/app/scenarios/[id]/approval/
+- [X] T121 [US2] Implementar convite de membros com vínculo por e-mail ainda sem conta em apps/api/src/services/membership.service.ts (FR-009, FR-018)
+- [X] T122 [US2] Implementar as rotas de membros em apps/api/src/routes/v1/members.routes.ts
+- [X] T123 [US2] Implementar o fechamento de equipe exigindo aprovador e travando a composição em apps/api/src/services/team.service.ts (FR-013, FR-014, FR-015)
+- [X] T124 [US2] Implementar a rota de aprovação com decisão APPROVE e RETURN com motivo em apps/api/src/routes/v1/approval.routes.ts (FR-055, FR-056)
+- [X] T125 [US2] Implementar a publicação do e-mail de previsão pronta ao aprovador ao concluir o cálculo em apps/api/src/adapters/rabbitmq/forecast-result.consumer.ts (FR-053)
+- [X] T126 [P] [US2] Implementar a tela de montagem de equipe e atribuição de papéis em apps/web/src/app/scenarios/[id]/team/
+- [X] T127 [P] [US2] Implementar a tela de revisão e aprovação da previsão em apps/web/src/app/scenarios/[id]/approval/
 
 **Checkpoint**: US1 e US2 funcionam independentemente
 

@@ -14,7 +14,7 @@ import type { AuthPort, AuthedUser, Authenticator } from '../../composition/port
 export function createAuth(prisma: PrismaClient) {
   return betterAuth({
     database: prismaAdapter(prisma, { provider: 'postgresql' }),
-    secret: process.env.AUTH_SECRET ?? 'dev-secret-change-in-production',
+    secret: process.env.BETTER_AUTH_SECRET ?? process.env.AUTH_SECRET ?? 'dev-secret-change-in-production',
     baseURL: process.env.BETTER_AUTH_URL ?? 'http://localhost:3001',
     trustedOrigins: process.env.TRUSTED_ORIGINS?.split(',') ?? [],
     emailAndPassword: { enabled: true },

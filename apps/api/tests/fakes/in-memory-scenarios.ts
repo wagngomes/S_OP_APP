@@ -2,7 +2,10 @@ import { randomUUID } from 'node:crypto';
 import type {
   Authenticator,
   HistoryStats,
+  MemberRole,
+  MembershipRepository,
   ParametersRecord,
+  ScenarioMemberRecord,
   ScenarioRecord,
   ScenarioRepository,
   SegmentationLevelRecord,
@@ -109,6 +112,13 @@ export class InMemoryScenarios implements ScenarioRepository {
     }
   }
 
+  async setTeamClosed(scenarioId: string): Promise<void> {
+    const s = this.scenarios.get(scenarioId);
+    if (s) {
+      this.scenarios.set(scenarioId, { ...s, teamClosedAt: new Date().toISOString() });
+    }
+  }
+
   // --- utilidades de teste ---------------------------------------------------
 
   setPhase(scenarioId: string, phase: ScenarioRecord['phase']): void {
@@ -132,5 +142,70 @@ export class InMemoryScenarios implements ScenarioRepository {
 
   addMember(scenarioId: string, userId: string): void {
     this.members.get(scenarioId)?.add(userId);
+  }
+}
+
+export class InMemoryMembership implements MembershipRepository {
+  private readonly membersMap = new Map<string, ScenarioMemberRecord[]>();
+
+  async invite(input: {
+    scenarioId: string;
+    invitedEmail: string;
+    role: MemberRole;
+  }): Promise<ScenarioMemberRecord> {
+    const record: ScenarioMemberRecord = {
+      id: randomUUID(),
+      scenarioId: input.scenarioId,
+      userId: null,
+      invitedEmail: input.invitedEmail,
+      role: input.role,
+      collaborationDoneAt: null,
+      createdAt: new Date().toISOString(),
+    };
+    const list = this.membersMap.get(input.scenarioId) ?? [];
+    list.push(record);
+    this.membersMap.set(input.scenarioId, list);
+    return record;
+  }
+
+  async listMembers(scenarioId: string): Promise<ScenarioMemberRecord[]> {
+    return this.membersMap.get(scenarioId) ?? [];
+  }
+
+  async getRolesForUser(scenarioId: string, userId: string): Promise<MemberRole[]> {
+    return (this.membersMap.get(scenarioId) ?? [])
+      .filter((m) => m.userId === userId)
+      .map((m) => m.role);
+  }
+
+  async hasApprover(scenarioId: string): Promise<boolean> {
+    return (this.membersMap.get(scenarioId) ?? []).some((m) => m.role === 'APPROVER');
+  }
+
+  /** Vincula um usuário existente a convites pelo e-mail (chama-se no sign-up). */
+  linkUser(email: string, userId: string): void {
+    for (const list of this.membersMap.values()) {
+      for (const m of list) {
+        if (m.invitedEmail === email && m.userId === null) {
+          m.userId = userId;
+        }
+      }
+    }
+  }
+
+  /** Utilitário de teste: injeta um convite já aceito com userId conhecido. */
+  seedMember(scenarioId: string, userId: string, role: MemberRole): void {
+    const record: ScenarioMemberRecord = {
+      id: randomUUID(),
+      scenarioId,
+      userId,
+      invitedEmail: `${userId}@test.local`,
+      role,
+      collaborationDoneAt: null,
+      createdAt: new Date().toISOString(),
+    };
+    const list = this.membersMap.get(scenarioId) ?? [];
+    list.push(record);
+    this.membersMap.set(scenarioId, list);
   }
 }
